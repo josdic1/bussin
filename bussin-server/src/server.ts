@@ -1,3 +1,4 @@
+import { once } from "node:events";
 import { createApp } from "./app.js";
 import { config } from "./config.js";
 import {
@@ -7,12 +8,13 @@ import {
 
 async function startServer() {
   const database = await verifyDatabaseConnection();
+  const server = createApp().listen(config.PORT);
 
-  const server = createApp().listen(config.PORT, () => {
-    console.log(
-      `Bussin server listening on port ${config.PORT}; connected to ${database.database}`,
-    );
-  });
+  await once(server, "listening");
+
+  console.log(
+    `Bussin server listening on port ${config.PORT}; connected to ${database.database}`,
+  );
 
   async function stopServer(signal: string) {
     console.log(`${signal} received; stopping Bussin server.`);

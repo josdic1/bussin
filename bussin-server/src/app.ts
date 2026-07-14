@@ -1,8 +1,14 @@
 import cors from "cors";
-import express from "express";
+import express, {
+  type ErrorRequestHandler,
+} from "express";
 import { accessRouter } from "./auth/access.routes.js";
 import { config } from "./config.js";
 import { healthRouter } from "./modules/health/health.routes.js";
+import {
+  driverTripRouter,
+  parentTripRouter,
+} from "./modules/trips/trip.routes.js";
 
 export function createApp() {
   const app = express();
@@ -23,6 +29,28 @@ export function createApp() {
 
   app.use("/api/health", healthRouter);
   app.use("/api/access", accessRouter);
+  app.use("/api/driver/trip", driverTripRouter);
+  app.use("/api/parent/trip", parentTripRouter);
+
+  const errorHandler: ErrorRequestHandler = (
+    error,
+    _request,
+    response,
+    next,
+  ) => {
+    if (response.headersSent) {
+      next(error);
+      return;
+    }
+
+    console.error("Request failed:", error);
+
+    response.status(500).json({
+      error: "The server could not complete the request.",
+    });
+  };
+
+  app.use(errorHandler);
 
   return app;
 }
