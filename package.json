@@ -1,0 +1,18 @@
+{
+  "name": "bussin",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "bussin-frontend",
+    "bussin-server",
+    "bussin-shared"
+  ],
+  "scripts": {
+    "build": "npm run build -w @bussin/shared && npm run build -w @bussin/server && npm run build -w @bussin/frontend",
+    "check": "npm run check -w @bussin/shared && npm run check -w @bussin/server && npm run check -w @bussin/frontend"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
+

@@ -1,0 +1,15 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  color: #10231d;
+  background: #eff5f1;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, input, textarea { font: inherit; }
+.page { min-height: 100dvh; display: grid; place-items: center; padding: 1rem; }
+.driverPage { background: #153d32; }
+.card { width: min(100%, 34rem); padding: 2rem; border: 2px solid #153d32; background: white; }
+.eyebrow { margin: 0 0 1rem; font-size: 0.75rem; font-weight: 900; letter-spacing: 0.14em; }
+h1 { margin: 0 0 0.75rem; font-size: clamp(2.5rem, 10vw, 5rem); line-height: 0.9; letter-spacing: -0.06em; }
+
