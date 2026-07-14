@@ -63,16 +63,42 @@ export function DriverTripControls() {
   }
 
   useEffect(() => {
-    requestTrip()
-      .then(setTrip)
-      .catch((caughtError) => {
-        setError(
-          caughtError instanceof Error
-            ? caughtError.message
-            : "Could not load the current trip.",
-        );
-      })
-      .finally(() => setIsLoading(false));
+    let isActive = true;
+
+    async function refreshTrip() {
+      try {
+        const nextTrip = await requestTrip();
+
+        if (isActive) {
+          setTrip(nextTrip);
+          setError("");
+        }
+      } catch (caughtError) {
+        if (isActive) {
+          setError(
+            caughtError instanceof Error
+              ? caughtError.message
+              : "Could not load the current trip.",
+          );
+        }
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void refreshTrip();
+
+    const refreshInterval = window.setInterval(
+      () => void refreshTrip(),
+      5_000,
+    );
+
+    return () => {
+      isActive = false;
+      window.clearInterval(refreshInterval);
+    };
   }, []);
 
   const isSharing =
@@ -120,9 +146,9 @@ export function DriverTripControls() {
             setTrip(nextTrip);
             setLocationState("LIVE");
             setLocationMessage(
-              `Location live · accuracy ${Math.round(
-                position.coords.accuracy,
-              )} m`,
+              `Location live · accuracy about ${Math.round(
+                position.coords.accuracy * 3.28084,
+              )} ft`,
             );
           })
           .catch((caughtError) => {
@@ -191,7 +217,11 @@ export function DriverTripControls() {
       <p className="tripStatus">
         Status:{" "}
         <strong>
-          {isSharing ? "Sharing location" : "Not sharing"}
+          {trip?.status === "STALE"
+            ? "Location signal is stale"
+            : isSharing
+              ? "Sharing location"
+              : "Not sharing"}
         </strong>
       </p>
 
@@ -208,12 +238,15 @@ export function DriverTripControls() {
       {isSharing ? (
         <p
           className={
-            locationState === "ERROR"
+            locationState === "ERROR" ||
+            trip?.status === "STALE"
               ? "formError"
               : "tripDetail"
           }
         >
-          {locationMessage}
+          {trip?.status === "STALE"
+            ? "Location has not updated recently. Keep this page open and check location access."
+            : locationMessage}
         </p>
       ) : null}
 
