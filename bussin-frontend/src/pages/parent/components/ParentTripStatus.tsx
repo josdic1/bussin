@@ -1,0 +1,142 @@
+import {
+  parentTripViewSchema,
+  type ParentTripView,
+} from "@bussin/shared";
+import { useEffect, useState } from "react";
+import { appConfig } from "../../../config";
+
+const PARENT_CODE_STORAGE_KEY = "bussin.parentAccessCode";
+const REFRESH_INTERVAL_MILLISECONDS = 5_000;
+
+export function ParentTripStatus() {
+  const [trip, setTrip] = useState<ParentTripView | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function loadTrip() {
+      const parentCode = localStorage.getItem(
+        PARENT_CODE_STORAGE_KEY,
+      );
+
+      if (!parentCode) {
+        throw new Error("Parent access code is missing.");
+      }
+
+      const response = await fetch(
+        `${appConfig.apiUrl}/api/parent/trip`,
+        {
+          headers: {
+            "x-parent-code": parentCode,
+          },
+        },
+      );
+
+      const body = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(
+          body?.error ?? "Could not load the current trip.",
+        );
+      }
+
+      return parentTripViewSchema.parse(body);
+    }
+
+    function refreshTrip() {
+      loadTrip()
+        .then((nextTrip) => {
+          if (!isActive) {
+            return;
+          }
+
+          setTrip(nextTrip);
+          setError("");
+        })
+        .catch((caughtError) => {
+          if (!isActive) {
+            return;
+          }
+
+          setError(
+            caughtError instanceof Error
+              ? caughtError.message
+              : "Could not load the current trip.",
+          );
+        })
+        .finally(() => {
+          if (isActive) {
+            setIsLoading(false);
+          }
+        });
+    }
+
+    refreshTrip();
+
+    const refreshTimer = window.setInterval(
+      refreshTrip,
+      REFRESH_INTERVAL_MILLISECONDS,
+    );
+
+    return () => {
+      isActive = false;
+      window.clearInterval(refreshTimer);
+    };
+  }, []);
+
+  if (isLoading) {
+    return (
+      <section className="tripControls">
+        <p className="tripStatus">Loading trip status…</p>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="tripControls">
+        <p className="formError" role="alert">
+          {error}
+        </p>
+      </section>
+    );
+  }
+
+  if (trip?.status === "NOT_SHARING") {
+    return (
+      <section className="tripControls">
+        <p className="tripStatus">
+          Status: <strong>Bus location is not being shared</strong>
+        </p>
+      </section>
+    );
+  }
+
+  if (trip?.status === "STALE") {
+    return (
+      <section className="tripControls">
+        <p className="tripStatus">
+          Status: <strong>Location signal is stale</strong>
+        </p>
+        <p className="tripDetail">
+          The driver is sharing, but the latest location is old.
+        </p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="tripControls">
+      <p className="tripStatus">
+        Status: <strong>Bus trip is active</strong>
+      </p>
+      <p className="tripDetail">
+        {trip?.location
+          ? "Receiving the bus location."
+          : "Waiting for the first location update."}
+      </p>
+    </section>
+  );
+}
