@@ -1,6 +1,7 @@
 import {
   driverTripViewSchema,
   parentTripViewSchema,
+  type DriverLocationUpdate,
   type DriverTripView,
   type ParentTripView,
   type TripLocationView,
@@ -8,6 +9,7 @@ import {
 } from "@bussin/shared";
 import {
   findActiveTrip,
+  saveActiveTripLocation,
   startActiveTrip,
   stopActiveTrip,
   type ActiveTripRow,
@@ -108,5 +110,17 @@ export async function startTrip() {
 
 export async function stopTrip() {
   await stopActiveTrip();
+  return getDriverTrip();
+}
+
+export async function recordDriverLocation(
+  location: DriverLocationUpdate,
+) {
+  const locationId = await saveActiveTripLocation(location);
+
+  if (!locationId) {
+    return null;
+  }
+
   return getDriverTrip();
 }

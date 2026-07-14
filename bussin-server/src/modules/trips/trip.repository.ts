@@ -1,3 +1,4 @@
+import type { DriverLocationUpdate } from "@bussin/shared";
 import { databasePool } from "../../db/pool.js";
 
 export type ActiveTripRow = {
@@ -33,7 +34,10 @@ const activeTripQuery = `
 `;
 
 export async function findActiveTrip() {
-  const result = await databasePool.query<ActiveTripRow>(activeTripQuery);
+  const result = await databasePool.query<ActiveTripRow>(
+    activeTripQuery,
+  );
+
   return result.rows[0] ?? null;
 }
 
@@ -59,4 +63,54 @@ export async function stopActiveTrip() {
   `);
 
   return result.rows[0]?.trip_id ?? null;
+}
+
+export async function saveActiveTripLocation(
+  location: DriverLocationUpdate,
+) {
+  const result = await databasePool.query<{
+    location_id: string;
+  }>(
+    `
+      INSERT INTO trip_locations (
+        trip_id,
+        latitude,
+        longitude,
+        accuracy_meters,
+        heading_degrees,
+        speed_meters_per_second,
+        recorded_at
+      )
+      SELECT
+        trip.id,
+        $1,
+        $2,
+        $3,
+        $4,
+        $5,
+        $6
+      FROM trips AS trip
+      WHERE trip.stopped_at IS NULL
+      ON CONFLICT (trip_id, recorded_at)
+      DO UPDATE SET
+        latitude = EXCLUDED.latitude,
+        longitude = EXCLUDED.longitude,
+        accuracy_meters = EXCLUDED.accuracy_meters,
+        heading_degrees = EXCLUDED.heading_degrees,
+        speed_meters_per_second =
+          EXCLUDED.speed_meters_per_second,
+        received_at = now()
+      RETURNING id AS location_id
+    `,
+    [
+      location.latitude,
+      location.longitude,
+      location.accuracyMeters,
+      location.headingDegrees,
+      location.speedMetersPerSecond,
+      location.recordedAt,
+    ],
+  );
+
+  return result.rows[0]?.location_id ?? null;
 }
