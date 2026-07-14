@@ -1,4 +1,5 @@
 import { AccessCodeGate } from "../../auth/AccessCodeGate";
+import { DriverTripControls } from "./components/DriverTripControls";
 
 export function DriverPage() {
   return (
@@ -7,12 +8,14 @@ export function DriverPage() {
       eyebrow="BUSSIN · DRIVER"
       title="Share the trip."
       instructions="Enter the driver access code. You only need to enter it once on this device."
-      authorizedMessage="Driver access is confirmed. Trip sharing and driver controls will appear here next."
+      authorizedMessage="Driver access is confirmed."
       fieldLabel="Driver access code"
       submitLabel="Open driver controls"
       storageKey="bussin.driverAccessCode"
       endpoint="/api/access/driver"
       headerName="x-driver-code"
-    />
+    >
+      <DriverTripControls />
+    </AccessCodeGate>
   );
 }

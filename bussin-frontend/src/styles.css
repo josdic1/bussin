@@ -83,3 +83,24 @@ h1 { margin: 0 0 0.75rem; font-size: clamp(2.5rem, 10vw, 5rem); line-height: 0.9
   font-size: 0.9rem;
   font-weight: 700;
 }
+
+.tripControls {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #153d32;
+}
+
+.tripStatus {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.tripDetail {
+  margin: 0.5rem 0 0;
+  color: #40534c;
+}
+
+.tripAction {
+  width: 100%;
+  margin-top: 1.5rem;
+}
