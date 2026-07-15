@@ -9,7 +9,7 @@ body { margin: 0; }
 button, input, textarea { font: inherit; }
 .page { min-height: 100dvh; display: grid; place-items: center; padding: 1rem; }
 .driverPage { background: #153d32; }
-.card { width: min(100%, 34rem); padding: 2rem; border: 2px solid #153d32; background: white; }
+.card { width: min(100%, 34rem); padding: 2rem; border: 2px solid #153d32; background: white; overflow: hidden; }
 .eyebrow { margin: 0 0 1rem; font-size: 0.75rem; font-weight: 900; letter-spacing: 0.14em; }
 h1 { margin: 0 0 0.75rem; font-size: clamp(2.5rem, 10vw, 5rem); line-height: 0.9; letter-spacing: -0.06em; }
 
@@ -103,4 +103,35 @@ h1 { margin: 0 0 0.75rem; font-size: clamp(2.5rem, 10vw, 5rem); line-height: 0.9
 .tripAction {
   width: 100%;
   margin-top: 1.5rem;
+}
+
+.busMap {
+  position: relative;
+  isolation: isolate;
+  contain: layout paint;
+  z-index: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 18rem;
+  margin-top: 1.25rem;
+  overflow: hidden;
+  border: 2px solid #153d32;
+  background: #dce8e2;
+}
+
+.busMapStale .leaflet-tile-pane {
+  filter: grayscale(0.85) opacity(0.72);
+}
+
+.busMapMarker {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 3px solid #153d32;
+  border-radius: 50%;
+  background: white;
+  font-size: 1.5rem;
+  line-height: 1;
+  box-shadow: 0 3px 10px rgb(16 35 29 / 30%);
 }

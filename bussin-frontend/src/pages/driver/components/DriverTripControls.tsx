@@ -3,7 +3,7 @@ import {
   type DriverLocationUpdate,
   type DriverTripView,
 } from "@bussin/shared";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { appConfig } from "../../../config";
 
 const DRIVER_CODE_STORAGE_KEY = "bussin.driverAccessCode";
@@ -22,6 +22,11 @@ export function DriverTripControls() {
   const [locationState, setLocationState] =
     useState<LocationState>("OFF");
   const [locationMessage, setLocationMessage] = useState("");
+  const lastLocationRef = useRef<DriverLocationUpdate | null>(null);
+  const [tripLoadedAt, setTripLoadedAt] = useState(Date.now());
+  const [clockMilliseconds, setClockMilliseconds] = useState(
+    Date.now(),
+  );
 
   async function requestTrip(
     path = "",
@@ -71,6 +76,7 @@ export function DriverTripControls() {
 
         if (isActive) {
           setTrip(nextTrip);
+          setTripLoadedAt(Date.now());
           setError("");
         }
       } catch (caughtError) {
@@ -101,11 +107,32 @@ export function DriverTripControls() {
     };
   }, []);
 
+  useEffect(() => {
+    const clockTimer = window.setInterval(() => {
+      setClockMilliseconds(Date.now());
+    }, 1_000);
+
+    return () => {
+      window.clearInterval(clockTimer);
+    };
+  }, []);
+
   const isSharing =
     trip?.status === "SHARING" || trip?.status === "STALE";
 
+  const secondsSinceLastContact = trip?.location
+    ? Math.max(
+        0,
+        Math.floor(
+          trip.location.ageSeconds +
+            (clockMilliseconds - tripLoadedAt) / 1000,
+        ),
+      )
+    : null;
+
   useEffect(() => {
     if (!isSharing) {
+      lastLocationRef.current = null;
       setLocationState("OFF");
       setLocationMessage("");
       return;
@@ -141,9 +168,12 @@ export function DriverTripControls() {
           recordedAt: new Date(position.timestamp).toISOString(),
         };
 
+        lastLocationRef.current = location;
+
         requestTrip("/location", "POST", location)
           .then((nextTrip) => {
             setTrip(nextTrip);
+            setTripLoadedAt(Date.now());
             setLocationState("LIVE");
             setLocationMessage(
               `Location live · accuracy about ${Math.round(
@@ -181,8 +211,31 @@ export function DriverTripControls() {
       },
     );
 
+    const heartbeatTimer = window.setInterval(() => {
+      const lastLocation = lastLocationRef.current;
+
+      if (!lastLocation) {
+        return;
+      }
+
+      requestTrip("/location", "POST", lastLocation)
+        .then((nextTrip) => {
+          setTrip(nextTrip);
+          setTripLoadedAt(Date.now());
+        })
+        .catch((caughtError) => {
+          setLocationState("ERROR");
+          setLocationMessage(
+            caughtError instanceof Error
+              ? caughtError.message
+              : "The location heartbeat could not be sent.",
+          );
+        });
+    }, 10_000);
+
     return () => {
       navigator.geolocation.clearWatch(watchId);
+      window.clearInterval(heartbeatTimer);
     };
   }, [isSharing]);
 
@@ -197,6 +250,8 @@ export function DriverTripControls() {
       );
 
       setTrip(nextTrip);
+
+      setTripLoadedAt(Date.now());
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -250,16 +305,16 @@ export function DriverTripControls() {
         </p>
       ) : null}
 
-      {trip?.location && isSharing ? (
+      {secondsSinceLastContact !== null && isSharing ? (
         <p className="tripDetail">
-          Last update{" "}
-          {new Date(
-            trip.location.recordedAt,
-          ).toLocaleTimeString([], {
-            hour: "numeric",
-            minute: "2-digit",
-            second: "2-digit",
-          })}
+          Updated{" "}
+          {secondsSinceLastContact === 0
+            ? "just now"
+            : `${secondsSinceLastContact} ${
+                secondsSinceLastContact === 1
+                  ? "second"
+                  : "seconds"
+              } ago`}
         </p>
       ) : null}
 

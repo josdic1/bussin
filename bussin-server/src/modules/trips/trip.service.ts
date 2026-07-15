@@ -15,20 +15,21 @@ import {
   type ActiveTripRow,
 } from "./trip.repository.js";
 
-const LOCATION_STALE_AFTER_SECONDS = 90;
+const LOCATION_STALE_AFTER_SECONDS = 30;
 
 function getLocation(row: ActiveTripRow): TripLocationView | null {
   if (
     row.latitude === null ||
     row.longitude === null ||
-    row.recorded_at === null
+    row.recorded_at === null ||
+    row.received_at === null
   ) {
     return null;
   }
 
   const ageSeconds = Math.max(
     0,
-    (Date.now() - row.recorded_at.getTime()) / 1000,
+    (Date.now() - row.received_at.getTime()) / 1000,
   );
 
   return {

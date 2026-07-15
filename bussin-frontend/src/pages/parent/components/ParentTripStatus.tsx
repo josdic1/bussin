@@ -4,6 +4,7 @@ import {
 } from "@bussin/shared";
 import { useEffect, useState } from "react";
 import { appConfig } from "../../../config";
+import { BusMap } from "./BusMap";
 
 const PARENT_CODE_STORAGE_KEY = "bussin.parentAccessCode";
 const REFRESH_INTERVAL_MILLISECONDS = 5_000;
@@ -123,6 +124,14 @@ export function ParentTripStatus() {
         <p className="tripDetail">
           The driver is sharing, but the latest location is old.
         </p>
+
+        {trip.location ? (
+          <BusMap
+            latitude={trip.location.latitude}
+            longitude={trip.location.longitude}
+            isStale
+          />
+        ) : null}
       </section>
     );
   }
@@ -137,6 +146,14 @@ export function ParentTripStatus() {
           ? "Receiving the bus location."
           : "Waiting for the first location update."}
       </p>
+
+      {trip?.location ? (
+        <BusMap
+          latitude={trip.location.latitude}
+          longitude={trip.location.longitude}
+          isStale={false}
+        />
+      ) : null}
     </section>
   );
 }

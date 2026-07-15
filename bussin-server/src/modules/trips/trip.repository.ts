@@ -8,6 +8,7 @@ export type ActiveTripRow = {
   latitude: number | null;
   longitude: number | null;
   recorded_at: Date | null;
+  received_at: Date | null;
 };
 
 const activeTripQuery = `
@@ -17,16 +18,18 @@ const activeTripQuery = `
     trip.driver_message,
     latest_location.latitude,
     latest_location.longitude,
-    latest_location.recorded_at
+    latest_location.recorded_at,
+    latest_location.received_at
   FROM trips AS trip
   LEFT JOIN LATERAL (
     SELECT
       location.latitude,
       location.longitude,
-      location.recorded_at
+      location.recorded_at,
+      location.received_at
     FROM trip_locations AS location
     WHERE location.trip_id = trip.id
-    ORDER BY location.recorded_at DESC
+    ORDER BY location.received_at DESC
     LIMIT 1
   ) AS latest_location ON true
   WHERE trip.stopped_at IS NULL
