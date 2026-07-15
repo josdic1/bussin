@@ -8,6 +8,8 @@ const environmentSchema = z.object({
   DATABASE_URL: z.string().min(1),
   PARENT_ACCESS_CODE: z.string().min(6).optional(),
   DRIVER_ACCESS_CODE: z.string().min(6).optional(),
+  OPENROUTESERVICE_API_KEY: z.string().min(1),
+  JCC_ADDRESS: z.string().min(1),
 });
 
 export const config = environmentSchema.parse(process.env);
