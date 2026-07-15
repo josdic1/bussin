@@ -15,44 +15,45 @@ const BUS_MARKER_ICON = L.divIcon({
   iconAnchor: [22, 22],
 });
 
-export function BusMap({
-  latitude,
-  longitude,
-  isStale,
-}: BusMapProps) {
+export function BusMap({ latitude, longitude, isStale }: BusMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
 
   function recenterMap() {
-    mapRef.current?.setView(
-      [latitude, longitude],
-      15,
-      { animate: true },
-    );
-  }
+    const map = mapRef.current;
+    const container = map?.getContainer();
 
-  useEffect(() => {
-    if (!containerRef.current || mapRef.current) {
+    if (!map || !container?.isConnected) {
       return;
     }
 
-    const location = L.latLng(latitude, longitude);
+    map.invalidateSize({ pan: false });
+    map.setView([latitude, longitude], 15, {
+      animate: true,
+    });
+  }
+
+  useEffect(() => {
     const container = containerRef.current;
+
+    if (!container || mapRef.current) {
+      return;
+    }
+
+    let isActive = true;
+    const location = L.latLng(latitude, longitude);
 
     const map = L.map(container, {
       zoomControl: true,
       attributionControl: true,
     }).setView(location, 15);
 
-    L.tileLayer(
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        maxZoom: 19,
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      },
-    ).addTo(map);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map);
 
     const marker = L.marker(location, {
       icon: BUS_MARKER_ICON,
@@ -60,44 +61,58 @@ export function BusMap({
     })
       .addTo(map)
       .bindTooltip(
-        isStale
-          ? "Last known bus location"
-          : "Current bus location",
+        isStale ? "Last known bus location" : "Current bus location",
       );
 
     mapRef.current = map;
     markerRef.current = marker;
 
     const resizeObserver = new ResizeObserver(() => {
+      if (!isActive || !container.isConnected) {
+        return;
+      }
+
       map.invalidateSize({ pan: false });
     });
 
     resizeObserver.observe(container);
 
-    window.setTimeout(() => {
+    const initialResize = window.setTimeout(() => {
+      if (!isActive || !container.isConnected) {
+        return;
+      }
+
       map.invalidateSize({ pan: false });
       map.setView(location, 15);
     }, 0);
 
     return () => {
+      isActive = false;
+      window.clearTimeout(initialResize);
       resizeObserver.disconnect();
-      map.remove();
-      mapRef.current = null;
+
       markerRef.current = null;
+      mapRef.current = null;
+      map.remove();
     };
   }, []);
 
   useEffect(() => {
+    const map = mapRef.current;
+    const marker = markerRef.current;
+    const container = map?.getContainer();
+
+    if (!map || !marker || !container?.isConnected || !map.hasLayer(marker)) {
+      return;
+    }
+
     const location = L.latLng(latitude, longitude);
 
-    markerRef.current?.setLatLng(location);
-    markerRef.current?.setTooltipContent(
-      isStale
-        ? "Last known bus location"
-        : "Current bus location",
+    marker.setLatLng(location);
+    marker.setTooltipContent(
+      isStale ? "Last known bus location" : "Current bus location",
     );
-
-    mapRef.current?.panTo(location);
+    map.panTo(location);
   }, [latitude, longitude, isStale]);
 
   return (
@@ -113,11 +128,7 @@ export function BusMap({
         }
       />
 
-      <button
-        className="mapRecenterButton"
-        type="button"
-        onClick={recenterMap}
-      >
+      <button className="mapRecenterButton" type="button" onClick={recenterMap}>
         Recenter bus
       </button>
     </div>

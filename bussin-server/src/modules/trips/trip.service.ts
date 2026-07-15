@@ -14,6 +14,7 @@ import {
   saveActiveTripLocation,
   startActiveTrip,
   stopActiveTrip,
+  updateActiveTripMessage,
   type ActiveTripRow,
 } from "./trip.repository.js";
 
@@ -150,6 +151,19 @@ export async function recordDriverLocation(
   const locationId = await saveActiveTripLocation(location);
 
   if (!locationId) {
+    return null;
+  }
+
+  return getDriverTrip();
+}
+
+
+export async function setDriverMessage(
+  message: string | null,
+) {
+  const tripId = await updateActiveTripMessage(message);
+
+  if (!tripId) {
     return null;
   }
 

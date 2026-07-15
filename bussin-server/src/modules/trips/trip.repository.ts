@@ -117,3 +117,24 @@ export async function saveActiveTripLocation(
 
   return result.rows[0]?.location_id ?? null;
 }
+
+
+export async function updateActiveTripMessage(
+  message: string | null,
+) {
+  const result = await databasePool.query<{
+    trip_id: string;
+  }>(
+    `
+      UPDATE trips
+      SET
+        driver_message = $1,
+        updated_at = now()
+      WHERE stopped_at IS NULL
+      RETURNING id AS trip_id
+    `,
+    [message],
+  );
+
+  return result.rows[0]?.trip_id ?? null;
+}

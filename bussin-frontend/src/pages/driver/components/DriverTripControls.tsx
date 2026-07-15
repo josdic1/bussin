@@ -3,10 +3,22 @@ import {
   type DriverLocationUpdate,
   type DriverTripView,
 } from "@bussin/shared";
-import { useEffect, useRef, useState } from "react";
+import {
+  type FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { appConfig } from "../../../config";
 
 const DRIVER_CODE_STORAGE_KEY = "bussin.driverAccessCode";
+
+const MESSAGE_PRESETS = [
+  "Running on time.",
+  "Traffic delay — running about 10 minutes late.",
+  "Leaving the JCC soon.",
+  "Please check the tracker for the latest location.",
+];
 
 type LocationState =
   | "OFF"
@@ -17,21 +29,30 @@ type LocationState =
 export function DriverTripControls() {
   const [trip, setTrip] = useState<DriverTripView | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [action, setAction] = useState<"START" | "STOP" | null>(null);
+  const [tripAction, setTripAction] =
+    useState<"START" | "STOP" | null>(null);
+  const [isSavingMessage, setIsSavingMessage] =
+    useState(false);
   const [error, setError] = useState("");
   const [locationState, setLocationState] =
     useState<LocationState>("OFF");
-  const [locationMessage, setLocationMessage] = useState("");
-  const lastLocationRef = useRef<DriverLocationUpdate | null>(null);
-  const [tripLoadedAt, setTripLoadedAt] = useState(Date.now());
-  const [clockMilliseconds, setClockMilliseconds] = useState(
-    Date.now(),
-  );
+  const [locationMessage, setLocationMessage] =
+    useState("");
+  const [messageDraft, setMessageDraft] = useState("");
+
+  const lastLocationRef =
+    useRef<DriverLocationUpdate | null>(null);
+  const messageInitializedRef = useRef(false);
+
+  const [tripLoadedAt, setTripLoadedAt] =
+    useState(Date.now());
+  const [clockMilliseconds, setClockMilliseconds] =
+    useState(Date.now());
 
   async function requestTrip(
     path = "",
     method: "GET" | "POST" = "GET",
-    body?: DriverLocationUpdate,
+    body?: unknown,
   ) {
     const driverCode = localStorage.getItem(
       DRIVER_CODE_STORAGE_KEY,
@@ -55,7 +76,8 @@ export function DriverTripControls() {
       },
     );
 
-    const responseBody = await response.json().catch(() => null);
+    const responseBody =
+      await response.json().catch(() => null);
 
     if (!response.ok) {
       throw new Error(
@@ -67,6 +89,16 @@ export function DriverTripControls() {
     return driverTripViewSchema.parse(responseBody);
   }
 
+  function acceptTrip(nextTrip: DriverTripView) {
+    setTrip(nextTrip);
+    setTripLoadedAt(Date.now());
+
+    if (!messageInitializedRef.current) {
+      setMessageDraft(nextTrip.driverMessage ?? "");
+      messageInitializedRef.current = true;
+    }
+  }
+
   useEffect(() => {
     let isActive = true;
 
@@ -75,8 +107,7 @@ export function DriverTripControls() {
         const nextTrip = await requestTrip();
 
         if (isActive) {
-          setTrip(nextTrip);
-          setTripLoadedAt(Date.now());
+          acceptTrip(nextTrip);
           setError("");
         }
       } catch (caughtError) {
@@ -112,13 +143,12 @@ export function DriverTripControls() {
       setClockMilliseconds(Date.now());
     }, 1_000);
 
-    return () => {
-      window.clearInterval(clockTimer);
-    };
+    return () => window.clearInterval(clockTimer);
   }, []);
 
   const isSharing =
-    trip?.status === "SHARING" || trip?.status === "STALE";
+    trip?.status === "SHARING" ||
+    trip?.status === "STALE";
 
   const secondsSinceLastContact = trip?.location
     ? Math.max(
@@ -165,18 +195,19 @@ export function DriverTripControls() {
             !Number.isFinite(position.coords.speed)
               ? null
               : position.coords.speed,
-          recordedAt: new Date(position.timestamp).toISOString(),
+          recordedAt: new Date(
+            position.timestamp,
+          ).toISOString(),
         };
 
         lastLocationRef.current = location;
 
         requestTrip("/location", "POST", location)
           .then((nextTrip) => {
-            setTrip(nextTrip);
-            setTripLoadedAt(Date.now());
+            acceptTrip(nextTrip);
             setLocationState("LIVE");
             setLocationMessage(
-              `Location live · accuracy about ${Math.round(
+              `Accuracy about ${Math.round(
                 position.coords.accuracy * 3.28084,
               )} ft`,
             );
@@ -193,9 +224,12 @@ export function DriverTripControls() {
       (locationError) => {
         setLocationState("ERROR");
 
-        if (locationError.code === locationError.PERMISSION_DENIED) {
+        if (
+          locationError.code ===
+          locationError.PERMISSION_DENIED
+        ) {
           setLocationMessage(
-            "Location permission was denied. Allow location access and try again.",
+            "Location access is blocked. Allow it and keep this page open.",
           );
           return;
         }
@@ -219,10 +253,7 @@ export function DriverTripControls() {
       }
 
       requestTrip("/location", "POST", lastLocation)
-        .then((nextTrip) => {
-          setTrip(nextTrip);
-          setTripLoadedAt(Date.now());
-        })
+        .then(acceptTrip)
         .catch((caughtError) => {
           setLocationState("ERROR");
           setLocationMessage(
@@ -239,8 +270,10 @@ export function DriverTripControls() {
     };
   }, [isSharing]);
 
-  async function handleAction(nextAction: "START" | "STOP") {
-    setAction(nextAction);
+  async function handleTripAction(
+    nextAction: "START" | "STOP",
+  ) {
+    setTripAction(nextAction);
     setError("");
 
     try {
@@ -249,9 +282,12 @@ export function DriverTripControls() {
         "POST",
       );
 
-      setTrip(nextTrip);
+      acceptTrip(nextTrip);
 
-      setTripLoadedAt(Date.now());
+      if (nextAction === "STOP") {
+        setMessageDraft("");
+        messageInitializedRef.current = false;
+      }
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -259,90 +295,197 @@ export function DriverTripControls() {
           : "The trip could not be updated.",
       );
     } finally {
-      setAction(null);
+      setTripAction(null);
     }
   }
 
-  if (isLoading) {
-    return <p className="tripStatus">Loading trip status…</p>;
+  async function saveMessage(message: string) {
+    setIsSavingMessage(true);
+    setError("");
+
+    try {
+      const normalizedMessage = message.trim();
+
+      const nextTrip = await requestTrip(
+        "/message",
+        "POST",
+        {
+          message: normalizedMessage || null,
+        },
+      );
+
+      setTrip(nextTrip);
+      setTripLoadedAt(Date.now());
+      setMessageDraft(nextTrip.driverMessage ?? "");
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "The parent update could not be sent.",
+      );
+    } finally {
+      setIsSavingMessage(false);
+    }
   }
 
-  return (
-    <section className="tripControls">
-      <p className="tripStatus">
-        Status:{" "}
-        <strong>
-          {trip?.status === "STALE"
-            ? "Location signal is stale"
-            : isSharing
-              ? "Sharing location"
-              : "Not sharing"}
-        </strong>
+  function submitCustomMessage(
+    event: FormEvent<HTMLFormElement>,
+  ) {
+    event.preventDefault();
+    void saveMessage(messageDraft);
+  }
+
+  if (isLoading) {
+    return (
+      <p className="driverLoading">
+        Loading driver controls…
       </p>
+    );
+  }
 
-      {trip?.startedAt && isSharing ? (
-        <p className="tripDetail">
-          Started{" "}
-          {new Date(trip.startedAt).toLocaleTimeString([], {
-            hour: "numeric",
-            minute: "2-digit",
-          })}
-        </p>
-      ) : null}
+  const statusLabel =
+    trip?.status === "STALE"
+      ? "GPS NEEDS ATTENTION"
+      : isSharing
+        ? "LOCATION IS LIVE"
+        : "TRIP IS OFF";
 
-      {isSharing ? (
-        <p
-          className={
-            locationState === "ERROR" ||
-            trip?.status === "STALE"
-              ? "formError"
-              : "tripDetail"
-          }
-        >
-          {trip?.status === "STALE"
-            ? "Location has not updated recently. Keep this page open and check location access."
-            : locationMessage}
-        </p>
-      ) : null}
+  return (
+    <section className="driverTripControls">
+      <section
+        className={`driverStatusPanel ${
+          trip?.status === "STALE" ||
+          locationState === "ERROR"
+            ? "driverStatusProblem"
+            : isSharing
+              ? "driverStatusLive"
+              : ""
+        }`}
+        aria-live="polite"
+      >
+        <p className="driverStatusEyebrow">Current status</p>
+        <p className="driverStatusLabel">{statusLabel}</p>
 
-      {secondsSinceLastContact !== null && isSharing ? (
-        <p className="tripDetail">
-          Updated{" "}
-          {secondsSinceLastContact === 0
-            ? "just now"
-            : `${secondsSinceLastContact} ${
-                secondsSinceLastContact === 1
-                  ? "second"
-                  : "seconds"
-              } ago`}
-        </p>
-      ) : null}
+        {isSharing ? (
+          <div className="driverStatusDetails">
+            <span>{locationMessage}</span>
+            {secondsSinceLastContact !== null ? (
+              <strong>
+                Updated {secondsSinceLastContact} seconds ago
+              </strong>
+            ) : null}
+          </div>
+        ) : (
+          <p className="driverStatusDetails">
+            Parents cannot see a live bus location.
+          </p>
+        )}
+      </section>
 
       {error ? (
-        <p className="formError" role="alert">
+        <p className="driverError" role="alert">
           {error}
         </p>
       ) : null}
 
+      <button
+        className={`driverTripButton ${
+          isSharing
+            ? "driverStopButton"
+            : "driverStartButton"
+        }`}
+        type="button"
+        disabled={tripAction !== null}
+        onClick={() =>
+          void handleTripAction(
+            isSharing ? "STOP" : "START",
+          )
+        }
+      >
+        {tripAction === "START"
+          ? "STARTING…"
+          : tripAction === "STOP"
+            ? "STOPPING…"
+            : isSharing
+              ? "STOP SHARING"
+              : "START SHARING"}
+      </button>
+
       {isSharing ? (
-        <button
-          className="secondaryButton tripAction"
-          type="button"
-          disabled={action !== null}
-          onClick={() => void handleAction("STOP")}
-        >
-          {action === "STOP" ? "Stopping…" : "Stop sharing"}
-        </button>
-      ) : (
-        <button
-          className="primaryButton tripAction"
-          type="button"
-          disabled={action !== null}
-          onClick={() => void handleAction("START")}
-        >
-          {action === "START" ? "Starting…" : "Start sharing"}
-        </button>
-      )}
+        <section className="driverMessagePanel">
+          <div className="driverMessageHeading">
+            <div>
+              <p className="driverStatusEyebrow">
+                Parent update
+              </p>
+              <h2>Send a message</h2>
+            </div>
+
+            {trip?.driverMessage ? (
+              <button
+                className="driverClearMessage"
+                type="button"
+                disabled={isSavingMessage}
+                onClick={() => void saveMessage("")}
+              >
+                Clear
+              </button>
+            ) : null}
+          </div>
+
+          {trip?.driverMessage ? (
+            <p className="driverCurrentMessage">
+              Live: <strong>{trip.driverMessage}</strong>
+            </p>
+          ) : null}
+
+          <div className="driverPresetGrid">
+            {MESSAGE_PRESETS.map((preset) => (
+              <button
+                key={preset}
+                className="driverPresetButton"
+                type="button"
+                disabled={isSavingMessage}
+                onClick={() => void saveMessage(preset)}
+              >
+                {preset}
+              </button>
+            ))}
+          </div>
+
+          <form
+            className="driverCustomMessage"
+            onSubmit={submitCustomMessage}
+          >
+            <label htmlFor="driver-message">
+              Custom update
+            </label>
+
+            <div className="driverMessageInputRow">
+              <input
+                id="driver-message"
+                type="text"
+                maxLength={160}
+                value={messageDraft}
+                placeholder="Type a short parent update"
+                onChange={(event) =>
+                  setMessageDraft(event.target.value)
+                }
+              />
+
+              <button
+                type="submit"
+                disabled={
+                  isSavingMessage ||
+                  !messageDraft.trim()
+                }
+              >
+                {isSavingMessage ? "SENDING…" : "SEND"}
+              </button>
+            </div>
+          </form>
+        </section>
+      ) : null}
     </section>
   );
 }

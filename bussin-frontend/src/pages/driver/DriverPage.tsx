@@ -1,5 +1,6 @@
 import { AccessCodeGate } from "../../auth/AccessCodeGate";
 import { DriverTripControls } from "./components/DriverTripControls";
+import { CurrentTime } from "../parent/components/CurrentTime";
 
 export function DriverPage() {
   return (
@@ -14,6 +15,7 @@ export function DriverPage() {
       storageKey="bussin.driverAccessCode"
       endpoint="/api/access/driver"
       headerName="x-driver-code"
+      headerExtra={<CurrentTime />}
     >
       <DriverTripControls />
     </AccessCodeGate>

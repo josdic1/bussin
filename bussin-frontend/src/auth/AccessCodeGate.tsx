@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useState,
-  type FormEvent,
-  type ReactNode,
-} from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { appConfig } from "../config";
 
 type AccessState = "CHECKING" | "LOCKED" | "SUBMITTING" | "AUTHORIZED";
@@ -20,6 +15,7 @@ type AccessCodeGateProps = {
   endpoint: string;
   headerName: "x-parent-code" | "x-driver-code";
   children?: ReactNode;
+  headerExtra?: ReactNode;
 };
 
 export function AccessCodeGate({
@@ -34,6 +30,7 @@ export function AccessCodeGate({
   endpoint,
   headerName,
   children,
+  headerExtra,
 }: AccessCodeGateProps) {
   const [accessCode, setAccessCode] = useState("");
   const [accessState, setAccessState] = useState<AccessState>("CHECKING");
@@ -126,7 +123,10 @@ export function AccessCodeGate({
     return (
       <main className={pageClasses}>
         <section className="card authorizedCard">
-          <p className="eyebrow">{eyebrow}</p>
+          <div className="authorizedHeader">
+            <p className="eyebrow">{eyebrow}</p>
+            {headerExtra}
+          </div>
           <h1>{title}</h1>
           <p className="bodyCopy">{authorizedMessage}</p>
 

@@ -7,30 +7,28 @@ type LocationAgeProps = {
 export function LocationAge({
   ageSeconds,
 }: LocationAgeProps) {
-  const [mountedAt] = useState(Date.now());
-  const [currentTime, setCurrentTime] = useState(Date.now());
+  const [seconds, setSeconds] = useState(
+    Math.max(0, Math.floor(ageSeconds)),
+  );
 
   useEffect(() => {
+    setSeconds(Math.max(0, Math.floor(ageSeconds)));
+
     const timer = window.setInterval(() => {
-      setCurrentTime(Date.now());
+      setSeconds((current) => current + 1);
     }, 1_000);
 
     return () => window.clearInterval(timer);
-  }, []);
-
-  const seconds = Math.max(
-    0,
-    Math.floor(
-      ageSeconds + (currentTime - mountedAt) / 1000,
-    ),
-  );
+  }, [ageSeconds]);
 
   return (
     <p className="parentLocationAge">
       Updated{" "}
       {seconds === 0
         ? "just now"
-        : `${seconds} ${seconds === 1 ? "second" : "seconds"} ago`}
+        : `${seconds} ${
+            seconds === 1 ? "second" : "seconds"
+          } ago`}
     </p>
   );
 }

@@ -1,7 +1,4 @@
-import {
-  parentTripViewSchema,
-  type ParentTripView,
-} from "@bussin/shared";
+import { parentTripViewSchema, type ParentTripView } from "@bussin/shared";
 import { useEffect, useState } from "react";
 import { appConfig } from "../../../config";
 import { ArrivalCountdown } from "./ArrivalCountdown";
@@ -21,29 +18,22 @@ export function ParentTripStatus() {
     let isActive = true;
 
     async function loadTrip() {
-      const parentCode = localStorage.getItem(
-        PARENT_CODE_STORAGE_KEY,
-      );
+      const parentCode = localStorage.getItem(PARENT_CODE_STORAGE_KEY);
 
       if (!parentCode) {
         throw new Error("Parent access code is missing.");
       }
 
-      const response = await fetch(
-        `${appConfig.apiUrl}/api/parent/trip`,
-        {
-          headers: {
-            "x-parent-code": parentCode,
-          },
+      const response = await fetch(`${appConfig.apiUrl}/api/parent/trip`, {
+        headers: {
+          "x-parent-code": parentCode,
         },
-      );
+      });
 
       const body = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(
-          body?.error ?? "Could not load the current trip.",
-        );
+        throw new Error(body?.error ?? "Could not load the current trip.");
       }
 
       return parentTripViewSchema.parse(body);
@@ -93,6 +83,12 @@ export function ParentTripStatus() {
   if (isLoading) {
     return (
       <section className="tripControls">
+        {trip?.driverMessage ? (
+          <aside className="parentDriverMessage">
+            <span>Driver update</span>
+            <strong>{trip.driverMessage}</strong>
+          </aside>
+        ) : null}
         <p className="tripStatus">Loading trip status…</p>
       </section>
     );
@@ -101,6 +97,12 @@ export function ParentTripStatus() {
   if (error) {
     return (
       <section className="tripControls">
+        {trip?.driverMessage ? (
+          <aside className="parentDriverMessage">
+            <span>Driver update</span>
+            <strong>{trip.driverMessage}</strong>
+          </aside>
+        ) : null}
         <p className="formError" role="alert">
           {error}
         </p>
@@ -111,6 +113,12 @@ export function ParentTripStatus() {
   if (trip?.status === "NOT_SHARING") {
     return (
       <section className="tripControls">
+        {trip?.driverMessage ? (
+          <aside className="parentDriverMessage">
+            <span>Driver update</span>
+            <strong>{trip.driverMessage}</strong>
+          </aside>
+        ) : null}
         <p className="tripStatus">
           Status: <strong>Bus location is not being shared</strong>
         </p>
@@ -121,6 +129,12 @@ export function ParentTripStatus() {
   if (trip?.status === "STALE") {
     return (
       <section className="tripControls">
+        {trip?.driverMessage ? (
+          <aside className="parentDriverMessage">
+            <span>Driver update</span>
+            <strong>{trip.driverMessage}</strong>
+          </aside>
+        ) : null}
         <p className="tripStatus">
           Status: <strong>Location signal is stale</strong>
         </p>
@@ -130,9 +144,7 @@ export function ParentTripStatus() {
 
         {trip.location ? (
           <div className="staleLocationAge">
-            <LocationAge
-              ageSeconds={trip.location.ageSeconds}
-            />
+            <LocationAge ageSeconds={trip.location.ageSeconds} />
           </div>
         ) : null}
 
@@ -149,6 +161,12 @@ export function ParentTripStatus() {
 
   return (
     <section className="tripControls">
+      {trip?.driverMessage ? (
+        <aside className="parentDriverMessage">
+          <span>Driver update</span>
+          <strong>{trip.driverMessage}</strong>
+        </aside>
+      ) : null}
       <p className="tripStatus">
         Status: <strong>Bus trip is active</strong>
       </p>
@@ -159,19 +177,13 @@ export function ParentTripStatus() {
       </p>
 
       {trip?.location ? (
-        <LocationAge
-          ageSeconds={trip.location.ageSeconds}
-        />
+        <LocationAge ageSeconds={trip.location.ageSeconds} />
       ) : null}
 
       {trip?.arrivalEstimate ? (
         <>
-          <ArrivalCountdown
-            estimate={trip.arrivalEstimate}
-          />
-          <LeaveCountdown
-            estimate={trip.arrivalEstimate}
-          />
+          <ArrivalCountdown estimate={trip.arrivalEstimate} />
+          <LeaveCountdown estimate={trip.arrivalEstimate} />
         </>
       ) : null}
 

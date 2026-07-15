@@ -1,10 +1,7 @@
 import type { ArrivalEstimate } from "@bussin/shared";
-import {
-  type FormEvent,
-  useEffect,
-  useState,
-} from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { appConfig } from "../../../config";
+import { PushAlertControl } from "./PushAlertControl";
 
 const STORAGE_KEY = "bussin.parentLeavePreferences";
 const PARENT_CODE_STORAGE_KEY = "bussin.parentAccessCode";
@@ -39,8 +36,7 @@ function loadPreferences(): LeavePreferences | null {
     return {
       travelMinutes: parsed.travelMinutes,
       cushionMinutes: parsed.cushionMinutes,
-      usesCurrentLocation:
-        parsed.usesCurrentLocation === true,
+      usesCurrentLocation: parsed.usesCurrentLocation === true,
     };
   } catch {
     return null;
@@ -50,41 +46,33 @@ function loadPreferences(): LeavePreferences | null {
 function getCurrentPosition() {
   return new Promise<GeolocationPosition>((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(
-        new Error("This device does not provide location."),
-      );
+      reject(new Error("This device does not provide location."));
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      resolve,
-      reject,
-      {
-        enableHighAccuracy: true,
-        maximumAge: 30_000,
-        timeout: 15_000,
-      },
-    );
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: true,
+      maximumAge: 30_000,
+      timeout: 15_000,
+    });
   });
 }
 
-export function LeaveCountdown({
-  estimate,
-}: LeaveCountdownProps) {
+export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
   const [currentTime, setCurrentTime] = useState(Date.now());
-  const [preferences, setPreferences] =
-    useState<LeavePreferences | null>(loadPreferences);
-  const [isEditing, setIsEditing] = useState(
-    preferences === null,
+  const [preferences, setPreferences] = useState<LeavePreferences | null>(
+    loadPreferences,
   );
+  const [isEditing, setIsEditing] = useState(preferences === null);
   const [travelMinutes, setTravelMinutes] = useState(
     preferences?.travelMinutes ?? 15,
   );
   const [cushionMinutes, setCushionMinutes] = useState(
     preferences?.cushionMinutes ?? 5,
   );
-  const [usesCurrentLocation, setUsesCurrentLocation] =
-    useState(preferences?.usesCurrentLocation ?? false);
+  const [usesCurrentLocation, setUsesCurrentLocation] = useState(
+    preferences?.usesCurrentLocation ?? false,
+  );
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState("");
 
@@ -101,9 +89,7 @@ export function LeaveCountdown({
     setLocationError("");
 
     try {
-      const parentCode = localStorage.getItem(
-        PARENT_CODE_STORAGE_KEY,
-      );
+      const parentCode = localStorage.getItem(PARENT_CODE_STORAGE_KEY);
 
       if (!parentCode) {
         throw new Error("Parent access code is missing.");
@@ -130,8 +116,7 @@ export function LeaveCountdown({
 
       if (!response.ok) {
         throw new Error(
-          body?.error ??
-            "Your drive time could not be calculated.",
+          body?.error ?? "Your drive time could not be calculated.",
         );
       }
 
@@ -175,10 +160,7 @@ export function LeaveCountdown({
       usesCurrentLocation,
     };
 
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(nextPreferences),
-    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextPreferences));
 
     setPreferences(nextPreferences);
     setIsEditing(false);
@@ -198,10 +180,7 @@ export function LeaveCountdown({
         usesCurrentLocation: true,
       };
 
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(nextPreferences),
-      );
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextPreferences));
 
       setPreferences(nextPreferences);
     } catch {
@@ -212,9 +191,7 @@ export function LeaveCountdown({
   function startEditing() {
     setTravelMinutes(preferences?.travelMinutes ?? 15);
     setCushionMinutes(preferences?.cushionMinutes ?? 5);
-    setUsesCurrentLocation(
-      preferences?.usesCurrentLocation ?? false,
-    );
+    setUsesCurrentLocation(preferences?.usesCurrentLocation ?? false);
     setLocationError("");
     setIsEditing(true);
   }
@@ -226,22 +203,15 @@ export function LeaveCountdown({
 
     setTravelMinutes(preferences.travelMinutes);
     setCushionMinutes(preferences.cushionMinutes);
-    setUsesCurrentLocation(
-      preferences.usesCurrentLocation,
-    );
+    setUsesCurrentLocation(preferences.usesCurrentLocation);
     setLocationError("");
     setIsEditing(false);
   }
 
   if (isEditing) {
     return (
-      <form
-        className="leavePreferences"
-        onSubmit={savePreferences}
-      >
-        <p className="arrivalLabel">
-          When should we tell you to leave?
-        </p>
+      <form className="leavePreferences" onSubmit={savePreferences}>
+        <p className="arrivalLabel">When should we tell you to leave?</p>
 
         <button
           className="locationTimingButton"
@@ -249,9 +219,7 @@ export function LeaveCountdown({
           disabled={isLocating}
           onClick={() => void calculateMyDrive()}
         >
-          {isLocating
-            ? "Calculating your drive…"
-            : "Use my current location"}
+          {isLocating ? "Calculating your drive…" : "Use my current location"}
         </button>
 
         {usesCurrentLocation ? (
@@ -260,10 +228,7 @@ export function LeaveCountdown({
           </p>
         ) : (
           <>
-            <label
-              className="fieldLabel"
-              htmlFor="travel-minutes"
-            >
+            <label className="fieldLabel" htmlFor="travel-minutes">
               Or enter my drive time
             </label>
 
@@ -272,19 +237,15 @@ export function LeaveCountdown({
               className="textInput"
               value={travelMinutes}
               onChange={(event) => {
-                setTravelMinutes(
-                  Number(event.target.value),
-                );
+                setTravelMinutes(Number(event.target.value));
                 setUsesCurrentLocation(false);
               }}
             >
-              {[5, 10, 15, 20, 25, 30, 35, 40, 45].map(
-                (minutes) => (
-                  <option key={minutes} value={minutes}>
-                    About {minutes} minutes
-                  </option>
-                ),
-              )}
+              {[5, 10, 15, 20, 25, 30, 35, 40, 45].map((minutes) => (
+                <option key={minutes} value={minutes}>
+                  About {minutes} minutes
+                </option>
+              ))}
             </select>
           </>
         )}
@@ -307,15 +268,11 @@ export function LeaveCountdown({
           id="cushion-minutes"
           className="textInput"
           value={cushionMinutes}
-          onChange={(event) =>
-            setCushionMinutes(Number(event.target.value))
-          }
+          onChange={(event) => setCushionMinutes(Number(event.target.value))}
         >
           {[0, 5, 10, 15].map((minutes) => (
             <option key={minutes} value={minutes}>
-              {minutes === 0
-                ? "At the same time"
-                : `${minutes} minutes early`}
+              {minutes === 0 ? "At the same time" : `${minutes} minutes early`}
             </option>
           ))}
         </select>
@@ -355,9 +312,7 @@ export function LeaveCountdown({
 
   const leaveInSeconds = Math.ceil(
     busArrivalSeconds -
-      (preferences!.travelMinutes +
-        preferences!.cushionMinutes) *
-        60,
+      (preferences!.travelMinutes + preferences!.cushionMinutes) * 60,
   );
 
   return (
@@ -367,12 +322,9 @@ export function LeaveCountdown({
       <p className="leaveCountdown">
         {leaveInSeconds <= 0
           ? "Leave now"
-          : `Leave in ${Math.floor(
-              leaveInSeconds / 60,
-            )}:${String(leaveInSeconds % 60).padStart(
-              2,
-              "0",
-            )}`}
+          : `Leave in ${Math.floor(leaveInSeconds / 60)}:${String(
+              leaveInSeconds % 60,
+            ).padStart(2, "0")}`}
       </p>
 
       <p className="tripDetail">
@@ -392,14 +344,15 @@ export function LeaveCountdown({
           </button>
         ) : null}
 
-        <button
-          className="timingButton"
-          type="button"
-          onClick={startEditing}
-        >
+        <button className="timingButton" type="button" onClick={startEditing}>
           Change timing
         </button>
       </div>
+
+      <PushAlertControl
+        travelMinutes={preferences!.travelMinutes}
+        cushionMinutes={preferences!.cushionMinutes}
+      />
 
       {locationError ? (
         <p className="leaveLocationError" role="alert">

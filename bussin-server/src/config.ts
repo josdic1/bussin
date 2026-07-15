@@ -10,6 +10,9 @@ const environmentSchema = z.object({
   DRIVER_ACCESS_CODE: z.string().min(6).optional(),
   OPENROUTESERVICE_API_KEY: z.string().min(1),
   JCC_ADDRESS: z.string().min(1),
+  VAPID_PUBLIC_KEY: z.string().min(1),
+  VAPID_PRIVATE_KEY: z.string().min(1),
+  VAPID_SUBJECT: z.string().min(1),
 });
 
 export const config = environmentSchema.parse(process.env);

@@ -5,6 +5,7 @@ import express, {
 import { accessRouter } from "./auth/access.routes.js";
 import { config } from "./config.js";
 import { healthRouter } from "./modules/health/health.routes.js";
+import { parentPushRouter } from "./modules/notifications/push.routes.js";
 import {
   driverTripRouter,
   parentTripRouter,
@@ -31,6 +32,7 @@ export function createApp() {
   app.use("/api/access", accessRouter);
   app.use("/api/driver/trip", driverTripRouter);
   app.use("/api/parent/trip", parentTripRouter);
+  app.use("/api/parent/push", parentPushRouter);
 
   const errorHandler: ErrorRequestHandler = (
     error,
