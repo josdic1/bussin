@@ -166,28 +166,6 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
     setIsEditing(false);
   }
 
-  async function updateSavedLocation() {
-    try {
-      const nextTravelMinutes = await calculateMyDrive();
-
-      if (!preferences) {
-        return;
-      }
-
-      const nextPreferences = {
-        ...preferences,
-        travelMinutes: nextTravelMinutes,
-        usesCurrentLocation: true,
-      };
-
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextPreferences));
-
-      setPreferences(nextPreferences);
-    } catch {
-      // The visible error message explains the problem.
-    }
-  }
-
   function startEditing() {
     setTravelMinutes(preferences?.travelMinutes ?? 15);
     setCushionMinutes(preferences?.cushionMinutes ?? 5);
@@ -348,19 +326,10 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
       />
 
       <div className="timingLinks">
-        {preferences!.usesCurrentLocation ? (
-          <button
-            className="timingButton"
-            type="button"
-            disabled={isLocating}
-            onClick={() => void updateSavedLocation()}
-          >
-            {isLocating ? "Updating…" : "Update my location"}
-          </button>
-        ) : null}
-
         <button className="timingButton" type="button" onClick={startEditing}>
-          Change timing
+          <span className="timingButtonSymbol" aria-hidden="true">▣</span>
+          <span>Change timing</span>
+          <span className="timingButtonArrow" aria-hidden="true">›</span>
         </button>
       </div>
 
