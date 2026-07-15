@@ -1,6 +1,5 @@
 import { AccessCodeGate } from "../../auth/AccessCodeGate";
 import { ParentTripStatus } from "./components/ParentTripStatus";
-import { CurrentTime } from "./components/CurrentTime";
 
 export function ParentPage() {
   return (
@@ -15,7 +14,11 @@ export function ParentPage() {
       storageKey="bussin.parentAccessCode"
       endpoint="/api/access/parent"
       headerName="x-parent-code"
-      headerExtra={<CurrentTime />}
+      headerExtra={
+        <span className="parentHeaderBus" aria-hidden="true">
+          🚌
+        </span>
+      }
     >
       <ParentTripStatus />
     </AccessCodeGate>

@@ -315,22 +315,37 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
       (preferences!.travelMinutes + preferences!.cushionMinutes) * 60,
   );
 
+  const shouldLeaveNow = leaveInSeconds <= 0;
+
   return (
-    <section className="leavePanel">
-      <p className="arrivalLabel">Your leave time</p>
+    <>
+      <section className="leaveHero">
+        <p className="arrivalLabel">
+          {shouldLeaveNow ? "It's time" : "Leave in"}
+        </p>
 
-      <p className="leaveCountdown">
-        {leaveInSeconds <= 0
-          ? "Leave now"
-          : `Leave in ${Math.floor(leaveInSeconds / 60)}:${String(
-              leaveInSeconds % 60,
-            ).padStart(2, "0")}`}
-      </p>
+        <p
+          className={`leaveCountdown${
+            shouldLeaveNow ? " leaveCountdownNow" : ""
+          }`}
+        >
+          {shouldLeaveNow
+            ? "Leave now"
+            : `${Math.floor(leaveInSeconds / 60)}:${String(
+                leaveInSeconds % 60,
+              ).padStart(2, "0")}`}
+        </p>
 
-      <p className="tripDetail">
-        {preferences!.travelMinutes} minute drive +{" "}
-        {preferences!.cushionMinutes} minute cushion
-      </p>
+        <p className="tripDetail">
+          {preferences!.travelMinutes} minute drive +{" "}
+          {preferences!.cushionMinutes} minute cushion
+        </p>
+      </section>
+
+      <PushAlertControl
+        travelMinutes={preferences!.travelMinutes}
+        cushionMinutes={preferences!.cushionMinutes}
+      />
 
       <div className="timingLinks">
         {preferences!.usesCurrentLocation ? (
@@ -349,16 +364,11 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
         </button>
       </div>
 
-      <PushAlertControl
-        travelMinutes={preferences!.travelMinutes}
-        cushionMinutes={preferences!.cushionMinutes}
-      />
-
       {locationError ? (
         <p className="leaveLocationError" role="alert">
           {locationError}
         </p>
       ) : null}
-    </section>
+    </>
   );
 }

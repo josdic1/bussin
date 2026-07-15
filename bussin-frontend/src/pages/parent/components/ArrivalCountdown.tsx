@@ -35,15 +35,13 @@ export function ArrivalCountdown({
 
   return (
     <section className="arrivalPanel">
-      <p className="arrivalLabel">Arrival at JCC</p>
+      <p className="arrivalLabel">Bus arrives in</p>
 
       <p className="arrivalCountdown">
         {minutes}:{String(seconds).padStart(2, "0")}
       </p>
 
-      <p className="tripDetail">
-        Estimated driving time to JCC MetroWest
-      </p>
+      <p className="tripDetail">Live estimate to JCC MetroWest</p>
     </section>
   );
 }

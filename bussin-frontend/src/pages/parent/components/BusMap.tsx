@@ -117,6 +117,8 @@ export function BusMap({ latitude, longitude, isStale }: BusMapProps) {
 
   return (
     <div className="busMapShell">
+      <span className="busMapLabel">Live bus map</span>
+
       <div
         ref={containerRef}
         className={`busMap${isStale ? " busMapStale" : ""}`}

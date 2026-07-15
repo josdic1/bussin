@@ -9,6 +9,15 @@ import { LocationAge } from "./LocationAge";
 const PARENT_CODE_STORAGE_KEY = "bussin.parentAccessCode";
 const REFRESH_INTERVAL_MILLISECONDS = 5_000;
 
+function DriverMessage({ message }: { message?: string | null }) {
+  return (
+    <aside className="parentDriverMessage">
+      <span>Latest driver message</span>
+      <strong>{message || "No new message from the driver."}</strong>
+    </aside>
+  );
+}
+
 export function ParentTripStatus() {
   const [trip, setTrip] = useState<ParentTripView | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -82,13 +91,8 @@ export function ParentTripStatus() {
 
   if (isLoading) {
     return (
-      <section className="tripControls">
-        {trip?.driverMessage ? (
-          <aside className="parentDriverMessage">
-            <span>Driver update</span>
-            <strong>{trip.driverMessage}</strong>
-          </aside>
-        ) : null}
+      <section className="tripControls parentDashboard parentDashboardState">
+        <DriverMessage message={trip?.driverMessage} />
         <p className="tripStatus">Loading trip status…</p>
       </section>
     );
@@ -96,13 +100,8 @@ export function ParentTripStatus() {
 
   if (error) {
     return (
-      <section className="tripControls">
-        {trip?.driverMessage ? (
-          <aside className="parentDriverMessage">
-            <span>Driver update</span>
-            <strong>{trip.driverMessage}</strong>
-          </aside>
-        ) : null}
+      <section className="tripControls parentDashboard parentDashboardState">
+        <DriverMessage message={trip?.driverMessage} />
         <p className="formError" role="alert">
           {error}
         </p>
@@ -112,13 +111,8 @@ export function ParentTripStatus() {
 
   if (trip?.status === "NOT_SHARING") {
     return (
-      <section className="tripControls">
-        {trip?.driverMessage ? (
-          <aside className="parentDriverMessage">
-            <span>Driver update</span>
-            <strong>{trip.driverMessage}</strong>
-          </aside>
-        ) : null}
+      <section className="tripControls parentDashboard parentDashboardState">
+        <DriverMessage message={trip?.driverMessage} />
         <p className="tripStatus">
           Status: <strong>Bus location is not being shared</strong>
         </p>
@@ -128,13 +122,8 @@ export function ParentTripStatus() {
 
   if (trip?.status === "STALE") {
     return (
-      <section className="tripControls">
-        {trip?.driverMessage ? (
-          <aside className="parentDriverMessage">
-            <span>Driver update</span>
-            <strong>{trip.driverMessage}</strong>
-          </aside>
-        ) : null}
+      <section className="tripControls parentDashboard parentDashboardState">
+        <DriverMessage message={trip?.driverMessage} />
         <p className="tripStatus">
           Status: <strong>Location signal is stale</strong>
         </p>
@@ -160,13 +149,8 @@ export function ParentTripStatus() {
   }
 
   return (
-    <section className="tripControls">
-      {trip?.driverMessage ? (
-        <aside className="parentDriverMessage">
-          <span>Driver update</span>
-          <strong>{trip.driverMessage}</strong>
-        </aside>
-      ) : null}
+    <section className="tripControls parentDashboard">
+      <DriverMessage message={trip?.driverMessage} />
       <p className="tripStatus">
         Status: <strong>Bus trip is active</strong>
       </p>

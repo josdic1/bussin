@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import { DriverPage } from "./pages/driver/DriverPage";
 import { ParentPage } from "./pages/parent/ParentPage";
 import "./styles.css";
+import "./parent-dashboard.css";
+import "./parent-dashboard.css";
 
 const Page = window.location.pathname.startsWith("/driver")
   ? DriverPage
