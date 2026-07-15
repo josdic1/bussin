@@ -23,12 +23,20 @@ const geocodingResponseSchema = z.object({
 });
 
 const directionsResponseSchema = z.object({
-  routes: z
+  features: z
     .array(
       z.object({
-        summary: z.object({
-          distance: z.number().nonnegative(),
-          duration: z.number().nonnegative(),
+        geometry: z.object({
+          type: z.literal("LineString"),
+          coordinates: z
+            .array(z.tuple([z.number(), z.number()]))
+            .min(2),
+        }),
+        properties: z.object({
+          summary: z.object({
+            distance: z.number().nonnegative(),
+            duration: z.number().nonnegative(),
+          }),
         }),
       }),
     )
@@ -41,6 +49,10 @@ export type DrivingEstimate = {
   durationSeconds: number;
   distanceMeters: number;
   destination: Destination;
+  route: Array<{
+    latitude: number;
+    longitude: number;
+  }>;
 };
 
 let destinationPromise: Promise<Destination> | null = null;
@@ -93,7 +105,7 @@ export async function getDrivingEstimate(
   const destination = await getJccDestination();
 
   const response = await fetch(
-    "https://api.openrouteservice.org/v2/directions/driving-car",
+    "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
     {
       method: "POST",
       headers: {
@@ -122,11 +134,20 @@ export async function getDrivingEstimate(
     await response.json(),
   );
 
-  const summary = body.routes[0].summary;
+  const feature = body.features[0];
+  const summary = feature.properties.summary;
+
+  const route = feature.geometry.coordinates.map(
+    ([longitude, latitude]) => ({
+      latitude,
+      longitude,
+    }),
+  );
 
   return {
     durationSeconds: summary.duration,
     distanceMeters: summary.distance,
     destination,
+    route,
   };
 }

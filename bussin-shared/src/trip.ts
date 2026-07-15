@@ -13,6 +13,11 @@ export const tripLocationViewSchema = z.object({
   ageSeconds: z.number().nonnegative(),
 });
 
+export const routeCoordinateSchema = z.object({
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+});
+
 export const arrivalEstimateSchema = z.object({
   durationSeconds: z.number().nonnegative(),
   distanceMeters: z.number().nonnegative(),
@@ -22,6 +27,7 @@ export const arrivalEstimateSchema = z.object({
     latitude: z.number().min(-90).max(90),
     longitude: z.number().min(-180).max(180),
   }),
+  route: z.array(routeCoordinateSchema).default([]),
 });
 
 export const parentTripViewSchema = z.object({

@@ -31,6 +31,7 @@ export async function getArrivalEstimate(
         distanceMeters: estimate.distanceMeters,
         calculatedAt: new Date().toISOString(),
         destination: estimate.destination,
+        route: estimate.route,
       });
 
       cachedEstimate = arrivalEstimate;

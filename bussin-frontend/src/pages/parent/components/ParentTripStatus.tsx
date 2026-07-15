@@ -141,6 +141,12 @@ export function ParentTripStatus() {
           <BusMap
             latitude={trip.location.latitude}
             longitude={trip.location.longitude}
+
+            destination={trip.arrivalEstimate?.destination}
+
+            route={trip.arrivalEstimate?.route}
+
+            routeCalculatedAt={trip.arrivalEstimate?.calculatedAt}
             isStale
           />
         ) : null}
@@ -175,6 +181,12 @@ export function ParentTripStatus() {
         <BusMap
           latitude={trip.location.latitude}
           longitude={trip.location.longitude}
+
+          destination={trip.arrivalEstimate?.destination}
+
+          route={trip.arrivalEstimate?.route}
+
+          routeCalculatedAt={trip.arrivalEstimate?.calculatedAt}
           isStale={false}
         />
       ) : null}
