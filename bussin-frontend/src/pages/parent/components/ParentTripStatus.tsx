@@ -4,6 +4,7 @@ import {
 } from "@bussin/shared";
 import { useEffect, useState } from "react";
 import { appConfig } from "../../../config";
+import { ArrivalCountdown } from "./ArrivalCountdown";
 import { BusMap } from "./BusMap";
 
 const PARENT_CODE_STORAGE_KEY = "bussin.parentAccessCode";
@@ -146,6 +147,12 @@ export function ParentTripStatus() {
           ? "Receiving the bus location."
           : "Waiting for the first location update."}
       </p>
+
+      {trip?.arrivalEstimate ? (
+        <ArrivalCountdown
+          estimate={trip.arrivalEstimate}
+        />
+      ) : null}
 
       {trip?.location ? (
         <BusMap

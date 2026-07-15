@@ -135,3 +135,27 @@ h1 { margin: 0 0 0.75rem; font-size: clamp(2.5rem, 10vw, 5rem); line-height: 0.9
   line-height: 1;
   box-shadow: 0 3px 10px rgb(16 35 29 / 30%);
 }
+
+.arrivalPanel {
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  border: 2px solid #153d32;
+  background: #eff5f1;
+}
+
+.arrivalLabel {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.arrivalCountdown {
+  margin: 0.35rem 0 0;
+  font-size: clamp(3rem, 14vw, 5rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+}

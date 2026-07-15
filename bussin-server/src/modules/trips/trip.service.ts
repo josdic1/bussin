@@ -1,12 +1,14 @@
 import {
   driverTripViewSchema,
   parentTripViewSchema,
+  type ArrivalEstimate,
   type DriverLocationUpdate,
   type DriverTripView,
   type ParentTripView,
   type TripLocationView,
   type TripStatus,
 } from "@bussin/shared";
+import { getArrivalEstimate } from "../routing/eta.service.js";
 import {
   findActiveTrip,
   saveActiveTripLocation,
@@ -17,7 +19,9 @@ import {
 
 const LOCATION_STALE_AFTER_SECONDS = 30;
 
-function getLocation(row: ActiveTripRow): TripLocationView | null {
+function getLocation(
+  row: ActiveTripRow,
+): TripLocationView | null {
   if (
     row.latitude === null ||
     row.longitude === null ||
@@ -79,12 +83,14 @@ function toDriverTripView(
 
 function toParentTripView(
   row: ActiveTripRow | null,
+  arrivalEstimate: ArrivalEstimate | null,
 ): ParentTripView {
   if (!row) {
     return parentTripViewSchema.parse({
       status: "NOT_SHARING",
       location: null,
       driverMessage: null,
+      arrivalEstimate: null,
     });
   }
 
@@ -94,6 +100,7 @@ function toParentTripView(
     status: getSharingStatus(location),
     location,
     driverMessage: row.driver_message,
+    arrivalEstimate,
   });
 }
 
@@ -102,7 +109,30 @@ export async function getDriverTrip() {
 }
 
 export async function getParentTrip() {
-  return toParentTripView(await findActiveTrip());
+  const row = await findActiveTrip();
+
+  if (!row) {
+    return toParentTripView(null, null);
+  }
+
+  const location = getLocation(row);
+
+  if (
+    !location ||
+    getSharingStatus(location) !== "SHARING"
+  ) {
+    return toParentTripView(row, null);
+  }
+
+  try {
+    const arrivalEstimate =
+      await getArrivalEstimate(location);
+
+    return toParentTripView(row, arrivalEstimate);
+  } catch (error) {
+    console.error("Bus ETA calculation failed:", error);
+    return toParentTripView(row, null);
+  }
 }
 
 export async function startTrip() {
