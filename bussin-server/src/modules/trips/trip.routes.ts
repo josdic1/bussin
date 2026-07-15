@@ -1,4 +1,7 @@
-import { driverLocationUpdateSchema } from "@bussin/shared";
+import {
+  coordinateSchema,
+  driverLocationUpdateSchema,
+} from "@bussin/shared";
 import {
   Router,
   type RequestHandler,
@@ -7,6 +10,7 @@ import {
   requireDriverAccess,
   requireParentAccess,
 } from "../../auth/access.js";
+import { getDrivingEstimate } from "../routing/openrouteservice.js";
 import {
   getDriverTrip,
   getParentTrip,
@@ -75,4 +79,31 @@ parentTripRouter.get(
   "/",
   requireParentAccess,
   sendResult(getParentTrip),
+);
+
+parentTripRouter.post(
+  "/travel-estimate",
+  requireParentAccess,
+  async (request, response, next) => {
+    try {
+      const location = coordinateSchema.safeParse(request.body);
+
+      if (!location.success) {
+        response.status(400).json({
+          error: "The parent location is invalid.",
+        });
+        return;
+      }
+
+      const estimate = await getDrivingEstimate(location.data);
+
+      response.json({
+        durationSeconds: estimate.durationSeconds,
+        distanceMeters: estimate.distanceMeters,
+        calculatedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 );

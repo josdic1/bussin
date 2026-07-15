@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { appConfig } from "../../../config";
 import { ArrivalCountdown } from "./ArrivalCountdown";
 import { BusMap } from "./BusMap";
+import { LeaveCountdown } from "./LeaveCountdown";
+import { LocationAge } from "./LocationAge";
 
 const PARENT_CODE_STORAGE_KEY = "bussin.parentAccessCode";
 const REFRESH_INTERVAL_MILLISECONDS = 5_000;
@@ -127,6 +129,14 @@ export function ParentTripStatus() {
         </p>
 
         {trip.location ? (
+          <div className="staleLocationAge">
+            <LocationAge
+              ageSeconds={trip.location.ageSeconds}
+            />
+          </div>
+        ) : null}
+
+        {trip.location ? (
           <BusMap
             latitude={trip.location.latitude}
             longitude={trip.location.longitude}
@@ -148,10 +158,21 @@ export function ParentTripStatus() {
           : "Waiting for the first location update."}
       </p>
 
-      {trip?.arrivalEstimate ? (
-        <ArrivalCountdown
-          estimate={trip.arrivalEstimate}
+      {trip?.location ? (
+        <LocationAge
+          ageSeconds={trip.location.ageSeconds}
         />
+      ) : null}
+
+      {trip?.arrivalEstimate ? (
+        <>
+          <ArrivalCountdown
+            estimate={trip.arrivalEstimate}
+          />
+          <LeaveCountdown
+            estimate={trip.arrivalEstimate}
+          />
+        </>
       ) : null}
 
       {trip?.location ? (

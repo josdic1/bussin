@@ -24,14 +24,23 @@ export function BusMap({
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
 
+  function recenterMap() {
+    mapRef.current?.setView(
+      [latitude, longitude],
+      15,
+      { animate: true },
+    );
+  }
+
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
       return;
     }
 
     const location = L.latLng(latitude, longitude);
+    const container = containerRef.current;
 
-    const map = L.map(containerRef.current, {
+    const map = L.map(container, {
       zoomControl: true,
       attributionControl: true,
     }).setView(location, 15);
@@ -59,7 +68,19 @@ export function BusMap({
     mapRef.current = map;
     markerRef.current = marker;
 
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize({ pan: false });
+    });
+
+    resizeObserver.observe(container);
+
+    window.setTimeout(() => {
+      map.invalidateSize({ pan: false });
+      map.setView(location, 15);
+    }, 0);
+
     return () => {
+      resizeObserver.disconnect();
       map.remove();
       mapRef.current = null;
       markerRef.current = null;
@@ -75,19 +96,30 @@ export function BusMap({
         ? "Last known bus location"
         : "Current bus location",
     );
+
     mapRef.current?.panTo(location);
   }, [latitude, longitude, isStale]);
 
   return (
-    <div
-      ref={containerRef}
-      className={`busMap${isStale ? " busMapStale" : ""}`}
-      role="img"
-      aria-label={
-        isStale
-          ? "Map showing the bus's last known location"
-          : "Map showing the bus's current location"
-      }
-    />
+    <div className="busMapShell">
+      <div
+        ref={containerRef}
+        className={`busMap${isStale ? " busMapStale" : ""}`}
+        role="img"
+        aria-label={
+          isStale
+            ? "Map showing the bus's last known location"
+            : "Map showing the bus's current location"
+        }
+      />
+
+      <button
+        className="mapRecenterButton"
+        type="button"
+        onClick={recenterMap}
+      >
+        Recenter bus
+      </button>
+    </div>
   );
 }

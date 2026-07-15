@@ -159,3 +159,315 @@ h1 { margin: 0 0 0.75rem; font-size: clamp(2.5rem, 10vw, 5rem); line-height: 0.9
   letter-spacing: -0.06em;
   font-variant-numeric: tabular-nums;
 }
+
+.leavePreferences,
+.leavePanel {
+  margin-top: 1rem;
+  padding: 1.25rem;
+  border: 2px solid #153d32;
+}
+
+.leavePreferences {
+  display: grid;
+  gap: 0.75rem;
+  background: white;
+}
+
+.leavePanel {
+  background: #153d32;
+  color: white;
+}
+
+.leavePanel .tripDetail {
+  color: #dce8e2;
+}
+
+.leaveCountdown {
+  margin: 0.5rem 0 0;
+  font-size: clamp(1.8rem, 8vw, 3rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.timingButton {
+  margin-top: 1rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: white;
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Final compact parent dashboard */
+.parentPage:has(.authorizedCard) {
+  display: block;
+  min-height: 100dvh;
+  padding: 0;
+  background: white;
+}
+
+.parentPage .authorizedCard {
+  width: min(100%, 34rem);
+  height: 100dvh;
+  margin: 0 auto;
+  padding: 1rem;
+  border-top: 0;
+  border-bottom: 0;
+  overflow: hidden;
+}
+
+.parentPage .authorizedCard > h1,
+.parentPage .authorizedCard > .bodyCopy {
+  display: none;
+}
+
+.parentPage .authorizedCard > .eyebrow {
+  margin: 0;
+}
+
+.parentPage .authorizedCard .tripControls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows:
+    auto
+    auto
+    auto
+    minmax(8rem, 1fr);
+  gap: 0.6rem;
+  height: calc(100dvh - 4.5rem);
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  overflow: hidden;
+}
+
+.parentPage .authorizedCard .tripStatus {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.parentPage .authorizedCard .tripControls > .tripDetail {
+  display: none;
+}
+
+.parentPage .authorizedCard .arrivalPanel,
+.parentPage .authorizedCard .leavePanel {
+  min-width: 0;
+  align-self: start;
+  margin: 0;
+  padding: 0.75rem;
+}
+
+.parentPage .authorizedCard .arrivalCountdown {
+  margin-top: 0.25rem;
+  font-size: clamp(2.35rem, 10vw, 3.5rem);
+}
+
+.parentPage .authorizedCard .leaveCountdown {
+  margin-top: 0.35rem;
+  font-size: clamp(1.45rem, 6vw, 2.25rem);
+}
+
+.parentPage .authorizedCard .arrivalPanel .tripDetail,
+.parentPage .authorizedCard .leavePanel .tripDetail {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+
+.parentPage .authorizedCard .timingButton {
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+}
+
+.parentPage .authorizedCard .busMap {
+  grid-column: 1 / -1;
+  align-self: stretch;
+  width: 100%;
+  height: 100%;
+  min-height: 8rem;
+  margin: 0;
+}
+
+.parentPage .authorizedCard > .accessChangeButton {
+  min-height: 0;
+  margin: 0.45rem 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 0.72rem;
+  text-decoration: underline;
+}
+
+.parentPage .authorizedCard .leavePreferences {
+  grid-column: 1 / -1;
+  align-self: start;
+  margin: 0;
+  padding: 0.75rem;
+  gap: 0.4rem;
+}
+
+.parentPage .authorizedCard .leavePreferences .tripDetail {
+  display: block;
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.25;
+}
+
+.parentPage .authorizedCard .leavePreferences .fieldLabel {
+  font-size: 0.68rem;
+}
+
+.parentPage .authorizedCard .leavePreferences .textInput,
+.parentPage .authorizedCard .leavePreferences .primaryButton {
+  min-height: 2.4rem;
+  margin-top: 0;
+  padding: 0.4rem 0.6rem;
+}
+
+@media (max-width: 380px), (max-height: 650px) {
+  .parentPage .authorizedCard {
+    padding: 0.7rem;
+  }
+
+  .parentPage .authorizedCard .tripControls {
+    height: calc(100dvh - 3.75rem);
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    gap: 0.4rem;
+  }
+
+  .parentPage .authorizedCard .arrivalPanel,
+  .parentPage .authorizedCard .leavePanel {
+    padding: 0.55rem;
+  }
+
+  .parentPage .authorizedCard .arrivalCountdown {
+    font-size: 2.25rem;
+  }
+
+  .parentPage .authorizedCard .leaveCountdown {
+    font-size: 1.4rem;
+  }
+}
+
+.preferenceActions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0.5rem;
+}
+
+.preferenceActions .primaryButton {
+  width: 100%;
+}
+
+.cancelTimingButton {
+  min-height: 2.4rem;
+  padding: 0.4rem 0.6rem;
+  border: 2px solid #153d32;
+  background: white;
+  color: #153d32;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.parentPage .authorizedCard .busMapShell {
+  position: relative;
+  grid-column: 1 / -1;
+  align-self: stretch;
+  min-height: 8rem;
+  overflow: hidden;
+}
+
+.parentPage .authorizedCard .busMapShell .busMap {
+  width: 100%;
+  height: 100%;
+  min-height: 8rem;
+  margin: 0;
+}
+
+.mapRecenterButton {
+  position: absolute;
+  z-index: 500;
+  right: 0.6rem;
+  top: 0.6rem;
+  min-height: 2.25rem;
+  padding: 0.4rem 0.65rem;
+  border: 2px solid #153d32;
+  background: white;
+  color: #153d32;
+  font-size: 0.75rem;
+  font-weight: 900;
+  box-shadow: 0 2px 8px rgb(16 35 29 / 20%);
+  cursor: pointer;
+}
+
+.locationTimingButton {
+  min-height: 2.5rem;
+  padding: 0.5rem 0.7rem;
+  border: 2px solid #153d32;
+  background: #153d32;
+  color: white;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.locationTimingButton:disabled,
+.timingButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.locationTimingResult {
+  margin: 0;
+  color: #153d32;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.manualTimingButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #153d32;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.timingLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.8rem;
+}
+
+.leaveLocationError {
+  margin: 0.4rem 0 0;
+  color: #ffd2ce;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.parentLocationAge {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #40534c;
+  font-size: 0.75rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.staleLocationAge {
+  grid-column: 1 / -1;
+}
+
+.staleLocationAge .parentLocationAge {
+  color: #a2261f;
+}

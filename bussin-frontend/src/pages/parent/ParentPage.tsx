@@ -4,6 +4,7 @@ import { ParentTripStatus } from "./components/ParentTripStatus";
 export function ParentPage() {
   return (
     <AccessCodeGate
+      pageClassName="parentPage"
       eyebrow="BUSSIN · PARENTS"
       title="Know when to leave."
       instructions="Enter the parent access code provided by the camp. You only need to enter it once on this device."

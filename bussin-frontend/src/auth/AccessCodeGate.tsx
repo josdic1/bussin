@@ -125,7 +125,7 @@ export function AccessCodeGate({
   if (accessState === "AUTHORIZED") {
     return (
       <main className={pageClasses}>
-        <section className="card">
+        <section className="card authorizedCard">
           <p className="eyebrow">{eyebrow}</p>
           <h1>{title}</h1>
           <p className="bodyCopy">{authorizedMessage}</p>
@@ -133,7 +133,7 @@ export function AccessCodeGate({
           {children}
 
           <button
-            className="secondaryButton"
+            className="secondaryButton accessChangeButton"
             type="button"
             onClick={handleSignOut}
           >
