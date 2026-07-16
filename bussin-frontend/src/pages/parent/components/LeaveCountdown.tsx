@@ -486,10 +486,13 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
     return (
       <section className="parentQuickSetup" aria-label="Parent alert setup">
         <header className="parentQuickSetupHeader">
-          <p className="panelKicker">Before the bus starts</p>
-          <h2>Get ready</h2>
-          <p>Tap what you want Bussin to use.</p>
+          <p className="panelKicker">You’ll get an alert when we do</p>
+          <h2>Waiting for bus data…</h2>
         </header>
+
+        <p className="parentQuickSetupPrompt">
+          Tap what you want Bussin to use
+        </p>
 
         <div className="parentQuickSetupChoices">
           <button
