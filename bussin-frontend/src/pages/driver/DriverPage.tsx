@@ -8,6 +8,7 @@ export function DriverPage() {
     <IosInstallGate
       appName="Bussin Driver"
       storageKey="bussin.driverInstallGateSeenV2"
+      allowBrowserUse
     >
       <AccessCodeGate
         pageClassName="driverPage"

@@ -1,5 +1,4 @@
 import {
-  ArrowDown,
   ChevronDown,
   Ellipsis,
   HousePlus,
@@ -16,6 +15,7 @@ type NavigatorWithStandalone = Navigator & {
 type IosInstallGateProps = {
   appName: string;
   storageKey: string;
+  allowBrowserUse?: boolean;
   children: ReactNode;
 };
 
@@ -35,8 +35,15 @@ function isStandaloneApp() {
   );
 }
 
-function loadInitialPhase(): InstallPhase {
+function loadInitialPhase(
+  storageKey: string,
+  allowBrowserUse: boolean,
+): InstallPhase {
   if (!isIosDevice() || isStandaloneApp()) {
+    return "HIDDEN";
+  }
+
+  if (allowBrowserUse && localStorage.getItem(storageKey) === "browser") {
     return "HIDDEN";
   }
 
@@ -46,9 +53,12 @@ function loadInitialPhase(): InstallPhase {
 export function IosInstallGate({
   appName,
   storageKey,
+  allowBrowserUse = false,
   children,
 }: IosInstallGateProps) {
-  const [phase, setPhase] = useState<InstallPhase>(loadInitialPhase);
+  const [phase, setPhase] = useState<InstallPhase>(() =>
+    loadInitialPhase(storageKey, allowBrowserUse),
+  );
   const audience = appName === "Bussin Driver" ? "DRIVER" : "PARENTS";
 
   if (phase === "HIDDEN") {
@@ -63,6 +73,11 @@ export function IosInstallGate({
   function showGuideAgain() {
     localStorage.removeItem(storageKey);
     setPhase("GUIDE");
+  }
+
+  function continueInBrowser() {
+    localStorage.setItem(storageKey, "browser");
+    setPhase("HIDDEN");
   }
 
   if (phase === "DONE") {
@@ -119,37 +134,38 @@ export function IosInstallGate({
             <p>Put the {appName} icon on your Home Screen.</p>
           </header>
 
-          <p className="iosInstallSafariShortcut">
-            Already see Share? Start at 2.
-          </p>
+          <div className="iosInstallChoicePrompt" aria-hidden="true">
+            <SquareArrowUp />
+            <strong>Which one do you see?</strong>
+            <Ellipsis />
+          </div>
 
-          <ol className="iosInstallFlow">
-            <li className="iosInstallStep">
-              <span className="iosInstallStepIcon" aria-hidden="true">
-                <Ellipsis />
-              </span>
-              <span className="iosInstallStepCopy">
-                <small>1</small>
-                <strong>Tap More</strong>
-              </span>
-            </li>
+          <div className="iosInstallChoicePaths">
+            <section className="iosInstallChoicePath">
+              <SquareArrowUp aria-hidden="true" />
+              <small>If you see Share</small>
+              <strong>Tap Share</strong>
+            </section>
 
-            <li className="iosInstallStep">
-              <span className="iosInstallStepIcon" aria-hidden="true">
-                <SquareArrowUp />
-              </span>
-              <span className="iosInstallStepCopy">
-                <small>2</small>
-                <strong>Tap Share</strong>
-              </span>
-            </li>
+            <section className="iosInstallChoicePath">
+              <Ellipsis aria-hidden="true" />
+              <small>If you see More</small>
+              <strong>Tap More</strong>
+              <span>Then tap Share</span>
+            </section>
+          </div>
 
+          <div className="iosInstallPathMerge" aria-hidden="true">
+            <span>Both continue here</span>
+            <ChevronDown />
+          </div>
+
+          <ol className="iosInstallCommonSteps">
             <li className="iosInstallStep">
               <span className="iosInstallStepIcon" aria-hidden="true">
                 <ChevronDown />
               </span>
               <span className="iosInstallStepCopy">
-                <small>3</small>
                 <strong>View More</strong>
               </span>
             </li>
@@ -159,7 +175,6 @@ export function IosInstallGate({
                 <HousePlus />
               </span>
               <span className="iosInstallStepCopy">
-                <small>4</small>
                 <strong>Add to Home Screen</strong>
               </span>
             </li>
@@ -176,11 +191,20 @@ export function IosInstallGate({
           >
             I tapped Add
           </button>
+
+          {allowBrowserUse ? (
+            <button
+              className="iosInstallBrowserContinue"
+              type="button"
+              onClick={continueInBrowser}
+            >
+              Use Driver in Safari
+            </button>
+          ) : null}
         </div>
 
         <div className="iosInstallTapHere" aria-hidden="true">
-          <span>Tap •••</span>
-          <ArrowDown />
+          <span>Which one do you see?</span>
         </div>
       </div>
     </section>
