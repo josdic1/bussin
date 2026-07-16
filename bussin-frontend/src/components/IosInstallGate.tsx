@@ -119,26 +119,33 @@ export function IosInstallGate({
             <p>Put the {appName} icon on your Home Screen.</p>
           </header>
 
-          <ol className="iosInstallSteps">
-            <li className="iosInstallStep">
-              <span className="iosInstallStepIcon" aria-hidden="true">
-                <SquareArrowUp />
-              </span>
-              <span className="iosInstallStepCopy">
-                <strong>Tap Share</strong>
-                <small>
-                  Or <Ellipsis aria-hidden="true" /> then Share
-                </small>
-              </span>
-            </li>
+          <div className="iosInstallSafariStart">
+            <p>First, tap the button you see</p>
 
+            <div className="iosInstallSafariChoices">
+              <span className="iosInstallSafariChoice">
+                <SquareArrowUp aria-hidden="true" />
+                <strong>Share</strong>
+              </span>
+
+              <span className="iosInstallSafariOr">or</span>
+
+              <span className="iosInstallSafariChoice">
+                <Ellipsis aria-hidden="true" />
+                <strong>More</strong>
+                <small>Then Share</small>
+              </span>
+            </div>
+          </div>
+
+          <ol className="iosInstallSteps">
             <li className="iosInstallStep">
               <span className="iosInstallStepIcon" aria-hidden="true">
                 <HousePlus />
               </span>
               <span className="iosInstallStepCopy">
                 <strong>Add to Home Screen</strong>
-                <small>Scroll down</small>
+                <small>Scroll down · If missing, Edit Actions</small>
               </span>
             </li>
 
@@ -148,6 +155,7 @@ export function IosInstallGate({
               </span>
               <span className="iosInstallStepCopy">
                 <strong>Tap Add</strong>
+                <small>Keep Open as Web App on</small>
               </span>
             </li>
           </ol>
@@ -157,7 +165,7 @@ export function IosInstallGate({
             type="button"
             onClick={finishGuide}
           >
-            I added the icon
+            I tapped Add
           </button>
         </div>
 

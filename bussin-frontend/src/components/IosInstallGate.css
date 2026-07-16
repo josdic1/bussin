@@ -132,9 +132,80 @@
   line-height: 1.1;
 }
 
+.iosInstallSafariStart {
+  border: var(--line) solid var(--ink);
+  background: var(--paper);
+}
+
+.iosInstallSafariStart > p {
+  margin: 0;
+  padding: 0.55rem 0.65rem 0.45rem;
+  border-bottom: var(--line) solid var(--ink);
+  font-family: var(--display-font);
+  font-size: clamp(1.15rem, 5.5vw, 1.7rem);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 0.9;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.iosInstallSafariChoices {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  min-height: clamp(5.2rem, 23vw, 7rem);
+  align-items: stretch;
+}
+
+.iosInstallSafariChoice {
+  display: grid;
+  min-width: 0;
+  place-content: center;
+  place-items: center;
+  gap: 0.22rem;
+  padding: 0.45rem;
+  text-align: center;
+}
+
+.iosInstallSafariChoice svg {
+  width: clamp(1.8rem, 8vw, 2.45rem);
+  height: clamp(1.8rem, 8vw, 2.45rem);
+  stroke-width: 2.7;
+}
+
+.iosInstallSafariChoice strong,
+.iosInstallSafariOr {
+  font-family: var(--display-font);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.iosInstallSafariChoice strong {
+  font-size: clamp(1.2rem, 5.7vw, 1.75rem);
+}
+
+.iosInstallSafariChoice small {
+  font-size: clamp(0.5rem, 2.3vw, 0.65rem);
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.iosInstallSafariOr {
+  display: grid;
+  min-width: clamp(2.4rem, 12vw, 3.2rem);
+  place-items: center;
+  border-inline: var(--line) solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  font-size: clamp(1rem, 4.8vw, 1.4rem);
+}
+
 .iosInstallSteps {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 0;
   padding: 0;
   border: var(--line) solid var(--ink);
@@ -190,7 +261,8 @@
   justify-content: center;
   gap: 0.08rem;
   margin-top: 0.4rem;
-  font-size: clamp(0.48rem, 2.1vw, 0.63rem);
+  max-width: 17ch;
+  font-size: clamp(0.46rem, 2vw, 0.62rem);
   font-weight: 900;
   letter-spacing: 0.02em;
   line-height: 1;
