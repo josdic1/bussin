@@ -6,7 +6,13 @@ export function DriverPage() {
   return (
     <AccessCodeGate
       pageClassName="driverPage"
-      eyebrow="BUSSIN · DRIVER"
+      eyebrow={
+        <>
+          <span className="parentBrandWord">BUSSIN</span>
+          <span className="parentBrandDot">•</span>
+          <span className="parentBrandAudience">DRIVER</span>
+        </>
+      }
       title="Share the trip."
       instructions="Enter the driver access code. You only need to enter it once on this device."
       authorizedMessage="Driver access is confirmed."
@@ -15,7 +21,12 @@ export function DriverPage() {
       storageKey="bussin.driverAccessCode"
       endpoint="/api/access/driver"
       headerName="x-driver-code"
-      headerExtra={<CurrentTime />}
+      headerExtra={
+        <span className="driverHeaderExtra">
+          <CurrentTime />
+          <img src="/icon-bus-acid.svg" alt="" />
+        </span>
+      }
     >
       <DriverTripControls />
     </AccessCodeGate>

@@ -1,3 +1,4 @@
+import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { appConfig } from "../../../config";
 
@@ -230,9 +231,13 @@ export function PushAlertControl({
 
   return (
     <div className="pushAlertControl">
+      <span className="pushAlertIcon" aria-hidden="true">
+        <Bell />
+      </span>
+
       {alertState === "ON" ? (
         <>
-          <p className="pushAlertStatus">Leave alert is on</p>
+          <p className="pushAlertStatus">Alert on</p>
 
           <button
             className="pushAlertButton"

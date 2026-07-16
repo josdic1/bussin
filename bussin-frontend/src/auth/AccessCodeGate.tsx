@@ -1,3 +1,4 @@
+import { CircleHelp, Menu, X } from "lucide-react";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { appConfig } from "../config";
 
@@ -5,7 +6,7 @@ type AccessState = "CHECKING" | "LOCKED" | "SUBMITTING" | "AUTHORIZED";
 
 type AccessCodeGateProps = {
   pageClassName?: string;
-  eyebrow: string;
+  eyebrow: ReactNode;
   title: string;
   instructions: string;
   authorizedMessage: string;
@@ -35,6 +36,8 @@ export function AccessCodeGate({
   const [accessCode, setAccessCode] = useState("");
   const [accessState, setAccessState] = useState<AccessState>("CHECKING");
   const [error, setError] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   async function verifyAccessCode(code: string) {
     const response = await fetch(`${appConfig.apiUrl}${endpoint}`, {
@@ -103,6 +106,7 @@ export function AccessCodeGate({
     localStorage.removeItem(storageKey);
     setAccessCode("");
     setError("");
+    setIsMenuOpen(false);
     setAccessState("LOCKED");
   }
 
@@ -127,18 +131,65 @@ export function AccessCodeGate({
             <p className="eyebrow">{eyebrow}</p>
             {headerExtra}
           </div>
-          <h1>{title}</h1>
+
+          <div className="dashboardTitleBar">
+            <h1>{title}</h1>
+
+            <button
+              className="dashboardMenuButton"
+              type="button"
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isMenuOpen}
+              aria-controls={`${storageKey}-menu`}
+              onClick={() => setIsMenuOpen((isOpen) => !isOpen)}
+            >
+              {isMenuOpen ? <X /> : <Menu />}
+            </button>
+
+            {isMenuOpen ? (
+              <div className="dashboardMenu" id={`${storageKey}-menu`}>
+                <button type="button" onClick={handleSignOut}>
+                  Use a different code
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    setIsHelpOpen(true);
+                  }}
+                >
+                  Help
+                </button>
+              </div>
+            ) : null}
+          </div>
+
           <p className="bodyCopy">{authorizedMessage}</p>
 
           {children}
 
-          <button
-            className="secondaryButton accessChangeButton"
-            type="button"
-            onClick={handleSignOut}
-          >
-            Use a different code
-          </button>
+          {isHelpOpen ? (
+            <div className="helpOverlay" role="dialog" aria-modal="true">
+              <section className="helpPanel">
+                <div className="helpPanelHeading">
+                  <CircleHelp aria-hidden="true" />
+                  <h2>Help</h2>
+                </div>
+                <p>{instructions}</p>
+                <p>
+                  If the code is not working, show this screen to a camp staff
+                  member and ask for the current code.
+                </p>
+                <button
+                  className="primaryButton"
+                  type="button"
+                  onClick={() => setIsHelpOpen(false)}
+                >
+                  Back to tracker
+                </button>
+              </section>
+            </div>
+          ) : null}
         </section>
       </main>
     );

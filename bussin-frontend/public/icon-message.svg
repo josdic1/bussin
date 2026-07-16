@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Message">
+  <path d="M9 12h46v34H30L18 56V46H9V12Z" fill="#f4f1e8"/>
+  <g fill="#070707">
+    <circle cx="23" cy="29" r="3.2"/>
+    <circle cx="32" cy="29" r="3.2"/>
+    <circle cx="41" cy="29" r="3.2"/>
+  </g>
+</svg>

@@ -1,3 +1,4 @@
+import { CalendarClock, MapPin, Power, RefreshCw, X } from "lucide-react";
 import type { ArrivalEstimate } from "@bussin/shared";
 import { type FormEvent, useEffect, useState } from "react";
 import { appConfig } from "../../../config";
@@ -75,6 +76,7 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
   );
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState("");
+  const [isLocationPanelOpen, setIsLocationPanelOpen] = useState(false);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -145,10 +147,44 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
       }
 
       setLocationError(message);
-      throw caughtError;
+      return null;
     } finally {
       setIsLocating(false);
     }
+  }
+
+  async function enableOrResetCurrentLocation() {
+    const nextTravelMinutes = await calculateMyDrive();
+
+    if (nextTravelMinutes === null) {
+      return;
+    }
+
+    const nextPreferences = {
+      travelMinutes: nextTravelMinutes,
+      cushionMinutes: preferences?.cushionMinutes ?? cushionMinutes,
+      usesCurrentLocation: true,
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextPreferences));
+    setPreferences(nextPreferences);
+    setTravelMinutes(nextTravelMinutes);
+    setUsesCurrentLocation(true);
+    setIsLocationPanelOpen(false);
+  }
+
+  function disableCurrentLocation() {
+    const nextPreferences = {
+      travelMinutes: preferences?.travelMinutes ?? travelMinutes,
+      cushionMinutes: preferences?.cushionMinutes ?? cushionMinutes,
+      usesCurrentLocation: false,
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextPreferences));
+    setPreferences(nextPreferences);
+    setUsesCurrentLocation(false);
+    setLocationError("");
+    setIsLocationPanelOpen(false);
   }
 
   function savePreferences(event: FormEvent) {
@@ -197,6 +233,7 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
           disabled={isLocating}
           onClick={() => void calculateMyDrive()}
         >
+          <MapPin aria-hidden="true" />
           {isLocating ? "Calculating your drive…" : "Use my current location"}
         </button>
 
@@ -326,14 +363,126 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
       />
 
       <div className="timingLinks">
+        <button
+          className={`locationQuickButton${
+            preferences!.usesCurrentLocation ? " locationQuickButtonActive" : ""
+          }`}
+          type="button"
+          aria-label={
+            preferences!.usesCurrentLocation
+              ? "Location is on. Open location controls."
+              : "Location is off. Open location controls."
+          }
+          onClick={() => {
+            setLocationError("");
+            setIsLocationPanelOpen(true);
+          }}
+        >
+          <span
+            className={`locationPin${
+              preferences!.usesCurrentLocation ? " locationPinActive" : ""
+            }`}
+            aria-hidden="true"
+          >
+            <MapPin />
+          </span>
+          <span>
+            Location {preferences!.usesCurrentLocation ? "on" : "off"}
+          </span>
+        </button>
+
         <button className="timingButton" type="button" onClick={startEditing}>
-          <span className="timingButtonSymbol" aria-hidden="true">▣</span>
+          <CalendarClock
+            className="timingButtonSymbol"
+            aria-hidden="true"
+          />
           <span>Change timing</span>
           <span className="timingButtonArrow" aria-hidden="true">›</span>
         </button>
       </div>
 
-      {locationError ? (
+      {isLocationPanelOpen ? (
+        <section
+          className="locationPanel"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="location-panel-title"
+        >
+          <button
+            className="panelCloseButton"
+            type="button"
+            aria-label="Close location controls"
+            onClick={() => setIsLocationPanelOpen(false)}
+          >
+            <X />
+          </button>
+
+          <span
+            className={`locationPanelPin${
+              preferences!.usesCurrentLocation || isLocating
+                ? " locationPanelPinActive"
+                : ""
+            }`}
+            aria-hidden="true"
+          >
+            <MapPin />
+          </span>
+
+          <p className="panelKicker">Drive-time location</p>
+          <h2 id="location-panel-title">
+            Location {preferences!.usesCurrentLocation ? "is on" : "is off"}
+          </h2>
+          <p className="locationPanelCopy">
+            {preferences!.usesCurrentLocation
+              ? `Your drive is currently set to about ${preferences!.travelMinutes} minutes.`
+              : "Turn it on to recalculate your drive from where you are now."}
+          </p>
+
+          {locationError ? (
+            <p className="formError" role="alert">
+              {locationError}
+            </p>
+          ) : null}
+
+          <div className="locationPanelActions">
+            <button
+              className="primaryButton"
+              type="button"
+              disabled={isLocating}
+              onClick={() => void enableOrResetCurrentLocation()}
+            >
+              {preferences!.usesCurrentLocation ? (
+                <RefreshCw aria-hidden="true" />
+              ) : (
+                <MapPin aria-hidden="true" />
+              )}
+              {isLocating
+                ? "Finding you…"
+                : preferences!.usesCurrentLocation
+                  ? "Reset location"
+                  : "Turn location on"}
+            </button>
+
+            {preferences!.usesCurrentLocation ? (
+              <button
+                className="secondaryButton"
+                type="button"
+                onClick={disableCurrentLocation}
+              >
+                <Power aria-hidden="true" />
+                Turn location off
+              </button>
+            ) : null}
+          </div>
+
+          <p className="locationPrivacyNote">
+            Your location is used only to calculate your drive time. Parents
+            never share a live location with the bus.
+          </p>
+        </section>
+      ) : null}
+
+      {locationError && !isLocationPanelOpen ? (
         <p className="leaveLocationError" role="alert">
           {locationError}
         </p>

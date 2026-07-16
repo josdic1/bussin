@@ -9,10 +9,9 @@
   ],
   "scripts": {
     "build": "npm run build -w @bussin/shared && npm run build -w @bussin/server && npm run build -w @bussin/frontend",
-    "check": "npm run check -w @bussin/shared && npm run check -w @bussin/server && npm run check -w @bussin/frontend"
+    "check": "npm run check -w @bussin/shared && npm run build -w @bussin/shared && npm run check -w @bussin/server && npm run check -w @bussin/frontend"
   },
   "engines": {
     "node": ">=20"
   }
 }
-

@@ -276,13 +276,6 @@ export function BusMap({
         }
       />
 
-      <button
-        className="mapRecenterButton"
-        type="button"
-        onClick={showWholeRoute}
-      >
-        Show route
-      </button>
     </div>
   );
 }

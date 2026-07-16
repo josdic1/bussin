@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@bussin/shared": "0.1.0",
+    "@fontsource/anton": "^5.2.7",
     "@vitejs/plugin-react": "^5.0.0",
     "leaflet": "^1.9.4",
+    "lucide-react": "^1.24.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "vite": "^7.0.0"

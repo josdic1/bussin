@@ -35,13 +35,25 @@ export function ArrivalCountdown({
 
   return (
     <section className="arrivalPanel">
-      <p className="arrivalLabel">Bus arrives in</p>
+      <div className="arrivalIconColumn" aria-hidden="true">
+        <img src="/icon-clock.svg" alt="" />
+      </div>
 
-      <p className="arrivalCountdown">
-        {minutes}:{String(seconds).padStart(2, "0")}
+      <div className="arrivalCopy">
+        <p className="arrivalLabel">Bus arrives in</p>
+
+        <p className="arrivalCountdown">
+          {minutes}:{String(seconds).padStart(2, "0")}
+        </p>
+      </div>
+
+      <div className="arrivalBusColumn" aria-hidden="true">
+        <img src="/icon-bus-red.svg" alt="" />
+      </div>
+
+      <p className="arrivalTripDetail">
+        Live estimate to JCC MetroWest
       </p>
-
-      <p className="tripDetail">Live estimate to JCC MetroWest</p>
     </section>
   );
 }

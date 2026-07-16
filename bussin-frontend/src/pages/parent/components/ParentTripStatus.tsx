@@ -12,8 +12,14 @@ const REFRESH_INTERVAL_MILLISECONDS = 5_000;
 function DriverMessage({ message }: { message?: string | null }) {
   return (
     <aside className="parentDriverMessage">
-      <span>Latest driver message</span>
-      <strong>{message || "No new message from the driver."}</strong>
+      <span className="driverMessageIcon" aria-hidden="true">
+        <img src="/icon-message.svg" alt="" />
+      </span>
+
+      <div className="driverMessageCopy">
+        <span>Latest driver message</span>
+        <strong>{message || "No new message from the driver."}</strong>
+      </div>
     </aside>
   );
 }
