@@ -1,4 +1,4 @@
-import * as webPush from "web-push";
+import webPush from "web-push";
 import { config } from "../../config.js";
 import {
   disablePushSubscription,
