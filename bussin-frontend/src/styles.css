@@ -544,6 +544,232 @@ button:disabled {
   overflow: hidden;
 }
 
+.iosInstallHelpButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  min-height: 3.2rem;
+  margin: 0 0 var(--gap);
+  padding: 0.45rem 0.8rem;
+  border: var(--line) solid var(--ink);
+  background: var(--acid);
+  color: var(--ink);
+  font-family: var(--display-font);
+  font-size: clamp(1.35rem, 6vw, 1.9rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.iosInstallHelpButton svg {
+  width: 1.65rem;
+  height: 1.65rem;
+  stroke-width: 2.8;
+}
+
+.iosInstallHelpOverlay {
+  position: fixed;
+  z-index: 4000;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, auto) auto;
+  place-items: center;
+  align-content: center;
+  gap: 0.7rem;
+  margin: 0;
+  padding: clamp(1rem, 5vw, 2rem);
+  border: 0;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.iosSafariPaths {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.45fr);
+  align-items: stretch;
+  width: min(100%, 48rem);
+  border: var(--line) solid var(--paper);
+  background: var(--acid);
+  color: var(--ink);
+}
+
+.iosSafariPath {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-width: 0;
+  padding: 0.5rem 0.65rem;
+  font-family: var(--display-font);
+  font-size: clamp(1rem, 4vw, 1.45rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.iosSafariPath svg {
+  flex: none;
+  width: clamp(1.6rem, 6vw, 2.2rem);
+  height: clamp(1.6rem, 6vw, 2.2rem);
+  stroke-width: 2.7;
+}
+
+.iosSafariOr {
+  display: grid;
+  place-items: center;
+  padding: 0.25rem 0.45rem;
+  border-right: 2px solid var(--ink);
+  border-left: 2px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--display-font);
+  font-size: 1rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.iosSafariPathArrow {
+  font-size: 1.8rem;
+  line-height: 0.7;
+}
+
+.iosInstallFallback {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.55rem;
+  width: min(100%, 48rem);
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border: 2px solid var(--paper);
+  color: var(--paper);
+  font-family: var(--support-font);
+  font-size: clamp(0.65rem, 2.7vw, 0.82rem);
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.iosInstallFallback strong {
+  color: var(--acid);
+}
+
+.iosInstallHelpClose {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  right: 1rem;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  padding: 0;
+  border: var(--line) solid var(--paper);
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+}
+
+.iosInstallHelpClose svg {
+  width: 2rem;
+  height: 2rem;
+  stroke-width: 3;
+}
+
+.iosInstallGuide {
+  width: min(100%, 76rem);
+}
+
+.iosInstallGuideWide {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.iosInstallGuideMobile {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  .iosInstallHelpOverlay {
+    align-content: start;
+    overflow-y: auto;
+    padding-top: calc(max(5rem, env(safe-area-inset-top) + 4rem));
+  }
+
+  .iosSafariPaths {
+    position: sticky;
+    z-index: 2;
+    top: calc(max(0.5rem, env(safe-area-inset-top)));
+  }
+
+  .iosSafariPath {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.42rem 0.35rem;
+    text-align: center;
+  }
+
+  .iosSafariPath strong {
+    width: 100%;
+    font-size: 0.88rem;
+  }
+
+  .iosSafariPathMore strong {
+    font-size: 0.78rem;
+  }
+
+  .iosInstallFallback {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  .iosInstallGuideWide {
+    display: none;
+  }
+
+  .iosInstallGuideMobile {
+    grid-template-columns: 1fr;
+    display: grid;
+    width: min(100%, 25rem);
+    margin: 0 auto;
+    gap: 0.8rem;
+  }
+
+  .iosInstallGuidePanel {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 0.697;
+    overflow: hidden;
+    border: 2px solid var(--paper);
+  }
+
+  .iosInstallGuidePanel img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 300%;
+    max-width: none;
+    height: 100%;
+  }
+
+  .iosInstallGuidePanel-two img {
+    transform: translateX(-33.333%);
+  }
+
+  .iosInstallGuidePanel-three img {
+    transform: translateX(-66.666%);
+  }
+}
+
 .pushAlertIcon {
   display: grid;
   place-items: center;

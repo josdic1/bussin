@@ -1,4 +1,5 @@
 import { AccessCodeGate } from "../../auth/AccessCodeGate";
+import { IosInstallHelp } from "./components/IosInstallHelp";
 import { ParentTripStatus } from "./components/ParentTripStatus";
 
 export function ParentPage() {
@@ -26,6 +27,7 @@ export function ParentPage() {
         </span>
       }
     >
+      <IosInstallHelp />
       <ParentTripStatus />
     </AccessCodeGate>
   );
