@@ -1,7 +1,6 @@
 import {
   AppWindow,
   ArrowDown,
-  Check,
   Ellipsis,
   HousePlus,
   RotateCcw,
@@ -36,7 +35,7 @@ function isStandaloneApp() {
   );
 }
 
-function loadInitialPhase(storageKey: string): InstallPhase {
+function loadInitialPhase(): InstallPhase {
   if (!isIosDevice() || isStandaloneApp()) {
     return "HIDDEN";
   }
@@ -49,9 +48,8 @@ export function IosInstallGate({
   storageKey,
   children,
 }: IosInstallGateProps) {
-  const [phase, setPhase] = useState<InstallPhase>(() =>
-    loadInitialPhase(storageKey),
-  );
+  const [phase, setPhase] = useState<InstallPhase>(loadInitialPhase);
+  const audience = appName === "Bussin Driver" ? "DRIVER" : "PARENTS";
 
   if (phase === "HIDDEN") {
     return children;
@@ -103,60 +101,65 @@ export function IosInstallGate({
       aria-label={`Add ${appName} to your Home Screen`}
     >
       <div className="iosInstallGateInner">
-        <header className="iosInstallGateHeader">
-          <p className="iosInstallGateKicker">One-time setup</p>
-          <h1>Add {appName}.</h1>
-          <p>Do these three steps in Safari.</p>
+        <header className="iosInstallBrand">
+          <div className="iosInstallBrandCopy">
+            <strong>BUSSIN</strong>
+            <span aria-hidden="true">•</span>
+            <b>{audience}</b>
+          </div>
+          <span className="iosInstallBrandBus" aria-hidden="true">
+            <img src="/icon-bus-acid.svg" alt="" />
+          </span>
         </header>
 
-        <ol className="iosInstallSteps">
-          <li className="iosInstallStep">
-            <span className="iosInstallStepNumber">1</span>
-            <span className="iosInstallStepIcon" aria-hidden="true">
-              <SquareArrowUp />
-            </span>
-            <span className="iosInstallStepCopy">
-              <strong>Tap Share</strong>
-              <small>
-                If you see <Ellipsis aria-hidden="true" /> first, tap it,
-                then tap Share.
-              </small>
-            </span>
-          </li>
+        <div className="iosInstallHero">
+          <header className="iosInstallGateHeader">
+            <p className="iosInstallGateKicker">One tap from home</p>
+            <h1>Keep Bussin close.</h1>
+            <p>Put the {appName} icon on your Home Screen.</p>
+          </header>
 
-          <li className="iosInstallStep">
-            <span className="iosInstallStepNumber">2</span>
-            <span className="iosInstallStepIcon" aria-hidden="true">
-              <HousePlus />
-            </span>
-            <span className="iosInstallStepCopy">
-              <strong>Add to Home Screen</strong>
-              <small>Scroll down to find it.</small>
-            </span>
-          </li>
+          <ol className="iosInstallSteps">
+            <li className="iosInstallStep">
+              <span className="iosInstallStepIcon" aria-hidden="true">
+                <SquareArrowUp />
+              </span>
+              <span className="iosInstallStepCopy">
+                <strong>Tap Share</strong>
+                <small>
+                  Or <Ellipsis aria-hidden="true" /> then Share
+                </small>
+              </span>
+            </li>
 
-          <li className="iosInstallStep">
-            <span className="iosInstallStepNumber">3</span>
-            <span className="iosInstallStepIcon" aria-hidden="true">
-              <AppWindow />
-            </span>
-            <span className="iosInstallStepCopy">
-              <strong>Tap Add</strong>
-              <small>Keep “Open as Web App” turned on.</small>
-            </span>
-          </li>
-        </ol>
+            <li className="iosInstallStep">
+              <span className="iosInstallStepIcon" aria-hidden="true">
+                <HousePlus />
+              </span>
+              <span className="iosInstallStepCopy">
+                <strong>Add to Home Screen</strong>
+                <small>Scroll down</small>
+              </span>
+            </li>
 
-        <button
-          className="iosInstallGateConfirm"
-          type="button"
-          onClick={finishGuide}
-        >
-          <span className="iosInstallConfirmBox" aria-hidden="true">
-            <Check />
-          </span>
-          <span>I added {appName}</span>
-        </button>
+            <li className="iosInstallStep">
+              <span className="iosInstallStepIcon" aria-hidden="true">
+                <AppWindow />
+              </span>
+              <span className="iosInstallStepCopy">
+                <strong>Tap Add</strong>
+              </span>
+            </li>
+          </ol>
+
+          <button
+            className="iosInstallGateConfirm"
+            type="button"
+            onClick={finishGuide}
+          >
+            I added the icon
+          </button>
+        </div>
 
         <div className="iosInstallTapHere" aria-hidden="true">
           <span>Tap here</span>
