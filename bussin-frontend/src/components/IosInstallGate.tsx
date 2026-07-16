@@ -41,7 +41,7 @@ function loadInitialPhase(storageKey: string): InstallPhase {
     return "HIDDEN";
   }
 
-  return localStorage.getItem(storageKey) ? "HIDDEN" : "GUIDE";
+  return "GUIDE";
 }
 
 export function IosInstallGate({
