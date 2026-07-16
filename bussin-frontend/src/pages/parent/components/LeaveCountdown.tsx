@@ -13,8 +13,14 @@ type LeavePreferences = {
   usesCurrentLocation: boolean;
 };
 
+const DEFAULT_PREFERENCES: LeavePreferences = {
+  travelMinutes: 15,
+  cushionMinutes: 5,
+  usesCurrentLocation: false,
+};
+
 type LeaveCountdownProps = {
-  estimate: ArrivalEstimate;
+  estimate?: ArrivalEstimate | null;
 };
 
 function loadPreferences(): LeavePreferences | null {
@@ -61,18 +67,18 @@ function getCurrentPosition() {
 
 export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
   const [currentTime, setCurrentTime] = useState(Date.now());
-  const [preferences, setPreferences] = useState<LeavePreferences | null>(
-    loadPreferences,
+  const [preferences, setPreferences] = useState<LeavePreferences>(
+    () => loadPreferences() ?? DEFAULT_PREFERENCES,
   );
-  const [isEditing, setIsEditing] = useState(preferences === null);
+  const [isEditing, setIsEditing] = useState(false);
   const [travelMinutes, setTravelMinutes] = useState(
-    preferences?.travelMinutes ?? 15,
+    preferences.travelMinutes,
   );
   const [cushionMinutes, setCushionMinutes] = useState(
-    preferences?.cushionMinutes ?? 5,
+    preferences.cushionMinutes,
   );
   const [usesCurrentLocation, setUsesCurrentLocation] = useState(
-    preferences?.usesCurrentLocation ?? false,
+    preferences.usesCurrentLocation,
   );
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState("");
@@ -162,7 +168,7 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
 
     const nextPreferences = {
       travelMinutes: nextTravelMinutes,
-      cushionMinutes: preferences?.cushionMinutes ?? cushionMinutes,
+      cushionMinutes: preferences.cushionMinutes,
       usesCurrentLocation: true,
     };
 
@@ -175,8 +181,8 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
 
   function disableCurrentLocation() {
     const nextPreferences = {
-      travelMinutes: preferences?.travelMinutes ?? travelMinutes,
-      cushionMinutes: preferences?.cushionMinutes ?? cushionMinutes,
+      travelMinutes: preferences.travelMinutes,
+      cushionMinutes: preferences.cushionMinutes,
       usesCurrentLocation: false,
     };
 
@@ -203,18 +209,14 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
   }
 
   function startEditing() {
-    setTravelMinutes(preferences?.travelMinutes ?? 15);
-    setCushionMinutes(preferences?.cushionMinutes ?? 5);
-    setUsesCurrentLocation(preferences?.usesCurrentLocation ?? false);
+    setTravelMinutes(preferences.travelMinutes);
+    setCushionMinutes(preferences.cushionMinutes);
+    setUsesCurrentLocation(preferences.usesCurrentLocation);
     setLocationError("");
     setIsEditing(true);
   }
 
   function cancelEditing() {
-    if (!preferences) {
-      return;
-    }
-
     setTravelMinutes(preferences.travelMinutes);
     setCushionMinutes(preferences.cushionMinutes);
     setUsesCurrentLocation(preferences.usesCurrentLocation);
@@ -299,15 +301,13 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
         ) : null}
 
         <div className="preferenceActions">
-          {preferences ? (
-            <button
-              className="cancelTimingButton"
-              type="button"
-              onClick={cancelEditing}
-            >
-              Cancel
-            </button>
-          ) : null}
+          <button
+            className="cancelTimingButton"
+            type="button"
+            onClick={cancelEditing}
+          >
+            Cancel
+          </button>
 
           <button className="primaryButton" type="submit">
             Set my leave time
@@ -317,59 +317,25 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
     );
   }
 
-  const elapsedSeconds =
-    (currentTime - Date.parse(estimate.calculatedAt)) / 1000;
+  const savedPreferences = preferences;
 
-  const busArrivalSeconds = Math.max(
-    0,
-    estimate.durationSeconds - elapsedSeconds,
-  );
-
-  const leaveInSeconds = Math.ceil(
-    busArrivalSeconds -
-      (preferences!.travelMinutes + preferences!.cushionMinutes) * 60,
-  );
-
-  const shouldLeaveNow = leaveInSeconds <= 0;
-
-  return (
+  const preferenceControls = (
     <>
-      <section className="leaveHero">
-        <p className="arrivalLabel">
-          {shouldLeaveNow ? "It's time" : "Leave in"}
-        </p>
-
-        <p
-          className={`leaveCountdown${
-            shouldLeaveNow ? " leaveCountdownNow" : ""
-          }`}
-        >
-          {shouldLeaveNow
-            ? "Leave now"
-            : `${Math.floor(leaveInSeconds / 60)}:${String(
-                leaveInSeconds % 60,
-              ).padStart(2, "0")}`}
-        </p>
-
-        <p className="tripDetail">
-          {preferences!.travelMinutes} minute drive +{" "}
-          {preferences!.cushionMinutes} minute cushion
-        </p>
-      </section>
-
       <PushAlertControl
-        travelMinutes={preferences!.travelMinutes}
-        cushionMinutes={preferences!.cushionMinutes}
+        travelMinutes={savedPreferences.travelMinutes}
+        cushionMinutes={savedPreferences.cushionMinutes}
       />
 
       <div className="timingLinks">
         <button
           className={`locationQuickButton${
-            preferences!.usesCurrentLocation ? " locationQuickButtonActive" : ""
+            savedPreferences.usesCurrentLocation
+              ? " locationQuickButtonActive"
+              : ""
           }`}
           type="button"
           aria-label={
-            preferences!.usesCurrentLocation
+            savedPreferences.usesCurrentLocation
               ? "Location is on. Open location controls."
               : "Location is off. Open location controls."
           }
@@ -380,14 +346,14 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
         >
           <span
             className={`locationPin${
-              preferences!.usesCurrentLocation ? " locationPinActive" : ""
+              savedPreferences.usesCurrentLocation ? " locationPinActive" : ""
             }`}
             aria-hidden="true"
           >
             <MapPin />
           </span>
           <span>
-            Location {preferences!.usesCurrentLocation ? "on" : "off"}
+            Location {savedPreferences.usesCurrentLocation ? "on" : "off"}
           </span>
         </button>
 
@@ -419,7 +385,7 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
 
           <span
             className={`locationPanelPin${
-              preferences!.usesCurrentLocation || isLocating
+              savedPreferences.usesCurrentLocation || isLocating
                 ? " locationPanelPinActive"
                 : ""
             }`}
@@ -430,11 +396,11 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
 
           <p className="panelKicker">Drive-time location</p>
           <h2 id="location-panel-title">
-            Location {preferences!.usesCurrentLocation ? "is on" : "is off"}
+            Location {savedPreferences.usesCurrentLocation ? "is on" : "is off"}
           </h2>
           <p className="locationPanelCopy">
-            {preferences!.usesCurrentLocation
-              ? `Your drive is currently set to about ${preferences!.travelMinutes} minutes.`
+            {savedPreferences.usesCurrentLocation
+              ? `Your drive is currently set to about ${savedPreferences.travelMinutes} minutes.`
               : "Turn it on to recalculate your drive from where you are now."}
           </p>
 
@@ -451,19 +417,19 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
               disabled={isLocating}
               onClick={() => void enableOrResetCurrentLocation()}
             >
-              {preferences!.usesCurrentLocation ? (
+              {savedPreferences.usesCurrentLocation ? (
                 <RefreshCw aria-hidden="true" />
               ) : (
                 <MapPin aria-hidden="true" />
               )}
               {isLocating
                 ? "Finding you…"
-                : preferences!.usesCurrentLocation
+                : savedPreferences.usesCurrentLocation
                   ? "Reset location"
                   : "Turn location on"}
             </button>
 
-            {preferences!.usesCurrentLocation ? (
+            {savedPreferences.usesCurrentLocation ? (
               <button
                 className="secondaryButton"
                 type="button"
@@ -487,6 +453,80 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
           {locationError}
         </p>
       ) : null}
+    </>
+  );
+
+  if (!estimate) {
+    return (
+      <section className="parentSetupPanel" aria-label="Parent alert setup">
+        <header className="parentSetupHeader">
+          <p className="panelKicker">Before the bus starts</p>
+          <h2>Get ready now</h2>
+          <p>
+            Set these once. Bussin will use them automatically when the driver
+            starts sharing.
+          </p>
+        </header>
+
+        <div className="parentSetupFacts">
+          <span>
+            <MapPin aria-hidden="true" />
+            <small>Drive time</small>
+            <strong>{savedPreferences.travelMinutes} min</strong>
+          </span>
+          <span>
+            <CalendarClock aria-hidden="true" />
+            <small>Arrive early</small>
+            <strong>{savedPreferences.cushionMinutes} min</strong>
+          </span>
+        </div>
+
+        {preferenceControls}
+      </section>
+    );
+  }
+
+  const elapsedSeconds =
+    (currentTime - Date.parse(estimate.calculatedAt)) / 1000;
+
+  const busArrivalSeconds = Math.max(
+    0,
+    estimate.durationSeconds - elapsedSeconds,
+  );
+
+  const leaveInSeconds = Math.ceil(
+    busArrivalSeconds -
+      (savedPreferences.travelMinutes + savedPreferences.cushionMinutes) * 60,
+  );
+
+  const shouldLeaveNow = leaveInSeconds <= 0;
+
+  return (
+    <>
+      <section className="leaveHero">
+        <p className="arrivalLabel">
+          {shouldLeaveNow ? "It's time" : "Leave in"}
+        </p>
+
+        <p
+          className={`leaveCountdown${
+            shouldLeaveNow ? " leaveCountdownNow" : ""
+          }`}
+        >
+          {shouldLeaveNow
+            ? "Leave now"
+            : `${Math.floor(leaveInSeconds / 60)}:${String(
+                leaveInSeconds % 60,
+              ).padStart(2, "0")}`}
+        </p>
+
+        <p className="tripDetail">
+          {savedPreferences.travelMinutes} minute drive +{" "}
+          {savedPreferences.cushionMinutes} minute cushion
+        </p>
+      </section>
+
+      {preferenceControls}
     </>
   );
 }

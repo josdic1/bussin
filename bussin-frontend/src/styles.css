@@ -2808,3 +2808,109 @@ body {
 .arrivalCopy .arrivalCountdown {
   letter-spacing: 0.005em;
 }
+.parentSetupPanel {
+  position: relative;
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-areas:
+    "setup"
+    "facts"
+    "alert"
+    "timing";
+  grid-template-rows: auto auto minmax(4.3rem, auto) minmax(3.8rem, auto);
+  align-content: start;
+  gap: var(--gap);
+  width: 100%;
+  min-height: 0;
+}
+
+.parentSetupHeader {
+  grid-area: setup;
+  padding: 0.75rem 0.9rem;
+  border: var(--line) solid var(--ink);
+  background: var(--paper);
+}
+
+.parentSetupHeader .panelKicker,
+.parentSetupHeader h2,
+.parentSetupHeader p {
+  margin: 0;
+}
+
+.parentSetupHeader .panelKicker {
+  color: var(--signal);
+  font-size: 0.68rem;
+}
+
+.parentSetupHeader h2 {
+  margin-top: 0.18rem;
+  font-family: var(--display-font);
+  font-size: clamp(2.1rem, 10vw, 3.5rem);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.parentSetupHeader > p:last-child {
+  max-width: 34rem;
+  margin-top: 0.42rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.parentSetupFacts {
+  grid-area: facts;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: var(--line) solid var(--ink);
+  background: var(--paper);
+}
+
+.parentSetupFacts > span {
+  display: grid;
+  grid-template-columns: 2.2rem minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 0.5rem;
+  min-width: 0;
+  padding: 0.55rem 0.65rem;
+}
+
+.parentSetupFacts > span + span {
+  border-left: var(--line) solid var(--ink);
+}
+
+.parentSetupFacts svg {
+  grid-row: 1 / 3;
+  width: 2.1rem;
+  height: 2.1rem;
+  stroke-width: 2.8;
+}
+
+.parentSetupFacts small {
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.parentSetupFacts strong {
+  font-family: var(--display-font);
+  font-size: clamp(1.25rem, 5.5vw, 1.8rem);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.parentSetupPanel .pushAlertControl,
+.parentSetupPanel .timingLinks {
+  min-height: 0;
+}
+
+.parentDashboardState > .parentSetupPanel {
+  margin-top: 0.2rem;
+}

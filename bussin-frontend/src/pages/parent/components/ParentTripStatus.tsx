@@ -129,6 +129,7 @@ export function ParentTripStatus() {
           sentAt={trip?.driverMessageUpdatedAt}
         />
         <p className="tripStatus">Loading trip status…</p>
+        <LeaveCountdown estimate={null} />
       </section>
     );
   }
@@ -143,6 +144,7 @@ export function ParentTripStatus() {
         <p className="formError" role="alert">
           {error}
         </p>
+        <LeaveCountdown estimate={null} />
       </section>
     );
   }
@@ -155,8 +157,13 @@ export function ParentTripStatus() {
           sentAt={trip?.driverMessageUpdatedAt}
         />
         <p className="tripStatus">
-          Status: <strong>Bus location is not being shared</strong>
+          <strong>The bus hasn’t started yet</strong>
         </p>
+        <p className="tripDetail">
+          Set up your leave alert now. This page will update automatically when
+          the driver starts sharing.
+        </p>
+        <LeaveCountdown estimate={null} />
       </section>
     );
   }
@@ -174,6 +181,8 @@ export function ParentTripStatus() {
         <p className="tripDetail">
           The driver is sharing, but the latest location is old.
         </p>
+
+        <LeaveCountdown estimate={null} />
 
         {trip.location ? (
           <div className="staleLocationAge">
@@ -198,6 +207,25 @@ export function ParentTripStatus() {
     );
   }
 
+  if (!trip?.arrivalEstimate) {
+    return (
+      <section className="tripControls parentDashboard parentDashboardState">
+        <DriverMessage
+          message={trip?.driverMessage}
+          sentAt={trip?.driverMessageUpdatedAt}
+        />
+        <p className="tripStatus">
+          <strong>The bus is getting ready</strong>
+        </p>
+        <p className="tripDetail">
+          Waiting for the first route estimate. Your settings are available
+          below.
+        </p>
+        <LeaveCountdown estimate={null} />
+      </section>
+    );
+  }
+
   return (
     <section className="tripControls parentDashboard">
       <DriverMessage
@@ -217,12 +245,9 @@ export function ParentTripStatus() {
         <LocationAge ageSeconds={trip.location.ageSeconds} />
       ) : null}
 
-      {trip?.arrivalEstimate ? (
-        <>
-          <ArrivalCountdown estimate={trip.arrivalEstimate} />
-          <LeaveCountdown estimate={trip.arrivalEstimate} />
-        </>
-      ) : null}
+      <ArrivalCountdown estimate={trip.arrivalEstimate} />
+
+      <LeaveCountdown estimate={trip.arrivalEstimate} />
 
       {trip?.location ? (
         <BusMap
