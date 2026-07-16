@@ -9,6 +9,19 @@ import { appConfig } from "../../../config";
 
 const DRIVER_CODE_STORAGE_KEY = "bussin.driverAccessCode";
 
+function formatMessageTime(
+  sentAt: string | null | undefined,
+) {
+  if (!sentAt) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(sentAt));
+}
+
 const MESSAGE_PRESETS = [
   { message: "LEAVING THE JCC!", lines: ["LEAVING", "THE JCC!"] },
   { message: "JUST ARRIVED AT CDR!", lines: ["JUST ARRIVED", "AT CDR!"] },
@@ -416,7 +429,14 @@ export function DriverTripControls() {
               •••
             </span>
             <p>
-              <small>LIVE PARENT MESSAGE</small>
+              <small>
+                LIVE PARENT MESSAGE
+                {trip?.driverMessageUpdatedAt
+                  ? ` • ${formatMessageTime(
+                      trip.driverMessageUpdatedAt,
+                    )}`
+                  : ""}
+              </small>
               <strong>{trip?.driverMessage || "No active message"}</strong>
             </p>
           </div>

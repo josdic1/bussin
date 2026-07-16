@@ -34,6 +34,7 @@ export const parentTripViewSchema = z.object({
   status: tripStatusSchema,
   location: tripLocationViewSchema.nullable(),
   driverMessage: z.string().nullable(),
+  driverMessageUpdatedAt: z.iso.datetime().nullable(),
   arrivalEstimate: arrivalEstimateSchema.nullable().default(null),
 });
 
@@ -43,6 +44,7 @@ export const driverTripViewSchema = z.object({
   startedAt: z.iso.datetime().nullable(),
   location: tripLocationViewSchema.nullable(),
   driverMessage: z.string().nullable(),
+  driverMessageUpdatedAt: z.iso.datetime().nullable(),
 });
 
 export type TripStatus = z.infer<typeof tripStatusSchema>;

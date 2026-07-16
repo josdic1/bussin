@@ -18,6 +18,7 @@ import {
   type ActiveTripRow,
 } from "./trip.repository.js";
 import { checkLeaveAlerts } from "../notifications/leave-alert.service.js";
+import { sendDriverMessageAlerts } from "../notifications/driver-message-alert.service.js";
 
 const LOCATION_STALE_AFTER_SECONDS = 30;
 
@@ -69,6 +70,7 @@ function toDriverTripView(
       startedAt: null,
       location: null,
       driverMessage: null,
+      driverMessageUpdatedAt: null,
     });
   }
 
@@ -80,6 +82,9 @@ function toDriverTripView(
     startedAt: row.started_at.toISOString(),
     location,
     driverMessage: row.driver_message,
+    driverMessageUpdatedAt: row.driver_message
+      ? row.driver_message_updated_at.toISOString()
+      : null,
   });
 }
 
@@ -92,6 +97,7 @@ function toParentTripView(
       status: "NOT_SHARING",
       location: null,
       driverMessage: null,
+      driverMessageUpdatedAt: null,
       arrivalEstimate: null,
     });
   }
@@ -102,6 +108,9 @@ function toParentTripView(
     status: getSharingStatus(location),
     location,
     driverMessage: row.driver_message,
+    driverMessageUpdatedAt: row.driver_message
+      ? row.driver_message_updated_at.toISOString()
+      : null,
     arrivalEstimate,
   });
 }
@@ -172,6 +181,10 @@ export async function setDriverMessage(
 
   if (!tripId) {
     return null;
+  }
+
+  if (message) {
+    void sendDriverMessageAlerts(message);
   }
 
   return getDriverTrip();

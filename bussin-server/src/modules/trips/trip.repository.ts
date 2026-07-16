@@ -5,6 +5,7 @@ export type ActiveTripRow = {
   trip_id: string;
   started_at: Date;
   driver_message: string | null;
+  driver_message_updated_at: Date;
   latitude: number | null;
   longitude: number | null;
   recorded_at: Date | null;
@@ -16,6 +17,7 @@ const activeTripQuery = `
     trip.id AS trip_id,
     trip.started_at,
     trip.driver_message,
+    trip.updated_at AS driver_message_updated_at,
     latest_location.latitude,
     latest_location.longitude,
     latest_location.recorded_at,

@@ -9,7 +9,26 @@ import { LocationAge } from "./LocationAge";
 const PARENT_CODE_STORAGE_KEY = "bussin.parentAccessCode";
 const REFRESH_INTERVAL_MILLISECONDS = 5_000;
 
-function DriverMessage({ message }: { message?: string | null }) {
+function formatMessageTime(sentAt?: string | null) {
+  if (!sentAt) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(sentAt));
+}
+
+function DriverMessage({
+  message,
+  sentAt,
+}: {
+  message?: string | null;
+  sentAt?: string | null;
+}) {
+  const formattedTime = formatMessageTime(sentAt);
+
   return (
     <aside className="parentDriverMessage">
       <span className="driverMessageIcon" aria-hidden="true">
@@ -17,7 +36,14 @@ function DriverMessage({ message }: { message?: string | null }) {
       </span>
 
       <div className="driverMessageCopy">
-        <span>Latest driver message</span>
+        <div className="driverMessageMeta">
+          <span>Latest driver message</span>
+          {formattedTime && sentAt ? (
+            <time dateTime={sentAt}>
+              {formattedTime}
+            </time>
+          ) : null}
+        </div>
         <strong>{message || "No new message from the driver."}</strong>
       </div>
     </aside>
@@ -98,7 +124,10 @@ export function ParentTripStatus() {
   if (isLoading) {
     return (
       <section className="tripControls parentDashboard parentDashboardState">
-        <DriverMessage message={trip?.driverMessage} />
+        <DriverMessage
+          message={trip?.driverMessage}
+          sentAt={trip?.driverMessageUpdatedAt}
+        />
         <p className="tripStatus">Loading trip status…</p>
       </section>
     );
@@ -107,7 +136,10 @@ export function ParentTripStatus() {
   if (error) {
     return (
       <section className="tripControls parentDashboard parentDashboardState">
-        <DriverMessage message={trip?.driverMessage} />
+        <DriverMessage
+          message={trip?.driverMessage}
+          sentAt={trip?.driverMessageUpdatedAt}
+        />
         <p className="formError" role="alert">
           {error}
         </p>
@@ -118,7 +150,10 @@ export function ParentTripStatus() {
   if (trip?.status === "NOT_SHARING") {
     return (
       <section className="tripControls parentDashboard parentDashboardState">
-        <DriverMessage message={trip?.driverMessage} />
+        <DriverMessage
+          message={trip?.driverMessage}
+          sentAt={trip?.driverMessageUpdatedAt}
+        />
         <p className="tripStatus">
           Status: <strong>Bus location is not being shared</strong>
         </p>
@@ -129,7 +164,10 @@ export function ParentTripStatus() {
   if (trip?.status === "STALE") {
     return (
       <section className="tripControls parentDashboard parentDashboardState">
-        <DriverMessage message={trip?.driverMessage} />
+        <DriverMessage
+          message={trip?.driverMessage}
+          sentAt={trip?.driverMessageUpdatedAt}
+        />
         <p className="tripStatus">
           Status: <strong>Location signal is stale</strong>
         </p>
@@ -162,7 +200,10 @@ export function ParentTripStatus() {
 
   return (
     <section className="tripControls parentDashboard">
-      <DriverMessage message={trip?.driverMessage} />
+      <DriverMessage
+        message={trip?.driverMessage}
+        sentAt={trip?.driverMessageUpdatedAt}
+      />
       <p className="tripStatus">
         Status: <strong>Bus trip is active</strong>
       </p>

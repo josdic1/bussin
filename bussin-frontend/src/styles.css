@@ -838,6 +838,23 @@ button:disabled {
   text-transform: uppercase;
 }
 
+.driverMessageMeta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.driverMessageCopy time {
+  flex: none;
+  font-family: var(--support-font);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
 .driverMessageCopy strong {
   display: -webkit-box;
   margin-top: 0.2rem;
