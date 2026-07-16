@@ -17,6 +17,7 @@ import {
   updateActiveTripMessage,
   type ActiveTripRow,
 } from "./trip.repository.js";
+import { checkLeaveAlerts } from "../notifications/leave-alert.service.js";
 
 const LOCATION_STALE_AFTER_SECONDS = 30;
 
@@ -154,7 +155,13 @@ export async function recordDriverLocation(
     return null;
   }
 
-  return getDriverTrip();
+  const trip = await getDriverTrip();
+
+  if (trip.tripId && trip.location) {
+    void checkLeaveAlerts(trip.tripId, trip.location);
+  }
+
+  return trip;
 }
 
 
