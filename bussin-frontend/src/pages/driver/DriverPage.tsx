@@ -1,4 +1,5 @@
 import { AccessCodeGate } from "../../auth/AccessCodeGate";
+import { IosInstallGate } from "../../components/IosInstallGate";
 import { DriverTripControls } from "./components/DriverTripControls";
 import { CurrentTime } from "../parent/components/CurrentTime";
 
@@ -28,7 +29,12 @@ export function DriverPage() {
         </span>
       }
     >
-      <DriverTripControls />
+      <IosInstallGate
+        appName="Bussin Driver"
+        storageKey="bussin.driverInstallGateSeen"
+      >
+        <DriverTripControls />
+      </IosInstallGate>
     </AccessCodeGate>
   );
 }

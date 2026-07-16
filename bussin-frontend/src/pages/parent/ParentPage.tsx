@@ -1,5 +1,5 @@
 import { AccessCodeGate } from "../../auth/AccessCodeGate";
-import { IosInstallHelp } from "./components/IosInstallHelp";
+import { IosInstallGate } from "../../components/IosInstallGate";
 import { ParentTripStatus } from "./components/ParentTripStatus";
 
 export function ParentPage() {
@@ -27,8 +27,12 @@ export function ParentPage() {
         </span>
       }
     >
-      <IosInstallHelp />
-      <ParentTripStatus />
+      <IosInstallGate
+        appName="Bussin"
+        storageKey="bussin.parentInstallGateSeen"
+      >
+        <ParentTripStatus />
+      </IosInstallGate>
     </AccessCodeGate>
   );
 }
