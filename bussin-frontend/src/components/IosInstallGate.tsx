@@ -1,6 +1,6 @@
 import {
   AppWindow,
-  BusFront,
+  ArrowDown,
   Check,
   Ellipsis,
   HousePlus,
@@ -52,7 +52,6 @@ export function IosInstallGate({
   const [phase, setPhase] = useState<InstallPhase>(() =>
     loadInitialPhase(storageKey),
   );
-  const [step, setStep] = useState(0);
 
   if (phase === "HIDDEN") {
     return children;
@@ -65,17 +64,7 @@ export function IosInstallGate({
 
   function showGuideAgain() {
     localStorage.removeItem(storageKey);
-    setStep(0);
     setPhase("GUIDE");
-  }
-
-  function completeStep() {
-    if (step === 2) {
-      finishGuide();
-      return;
-    }
-
-    setStep((currentStep) => currentStep + 1);
   }
 
   if (phase === "DONE") {
@@ -117,105 +106,62 @@ export function IosInstallGate({
         <header className="iosInstallGateHeader">
           <p className="iosInstallGateKicker">One-time setup</p>
           <h1>Add {appName}.</h1>
-          <p>Complete one stop at a time.</p>
+          <p>Do these three steps in Safari.</p>
         </header>
 
-        <div
-          className="iosInstallRoute"
-          aria-label={`Step ${step + 1} of 3`}
-        >
-          <span className="iosInstallRouteLine" aria-hidden="true" />
-          {[0, 1, 2].map((stop) => (
-            <span
-              className={`iosInstallRouteStop${
-                stop < step ? " iosInstallRouteStopDone" : ""
-              }${stop === step ? " iosInstallRouteStopCurrent" : ""}`}
-              key={stop}
-            >
-              {stop < step ? <Check aria-hidden="true" /> : stop + 1}
+        <ol className="iosInstallSteps">
+          <li className="iosInstallStep">
+            <span className="iosInstallStepNumber">1</span>
+            <span className="iosInstallStepIcon" aria-hidden="true">
+              <SquareArrowUp />
             </span>
-          ))}
-          <span
-            className={`iosInstallRouteBus iosInstallRouteBusStep${step + 1}`}
-            aria-hidden="true"
-          >
-            <BusFront />
-          </span>
-        </div>
+            <span className="iosInstallStepCopy">
+              <strong>Tap Share</strong>
+              <small>
+                If you see <Ellipsis aria-hidden="true" /> first, tap it,
+                then tap Share.
+              </small>
+            </span>
+          </li>
 
-        <p className="iosInstallStepCount">Stop {step + 1} of 3</p>
+          <li className="iosInstallStep">
+            <span className="iosInstallStepNumber">2</span>
+            <span className="iosInstallStepIcon" aria-hidden="true">
+              <HousePlus />
+            </span>
+            <span className="iosInstallStepCopy">
+              <strong>Add to Home Screen</strong>
+              <small>Scroll down to find it.</small>
+            </span>
+          </li>
 
-        <section className="iosInstallCurrentStep" aria-live="polite">
-          {step === 0 ? (
-            <>
-              <div className="iosInstallStepDrawing iosInstallShareDrawing">
-                <span>
-                  <SquareArrowUp aria-hidden="true" />
-                  <small>Share</small>
-                </span>
-                <b>or</b>
-                <span>
-                  <span className="iosInstallMoreThenShare">
-                    <Ellipsis aria-hidden="true" />
-                    <i>›</i>
-                    <SquareArrowUp aria-hidden="true" />
-                  </span>
-                  <small>More → Share</small>
-                </span>
-              </div>
-              <h2>Open Share.</h2>
-              <p>Use whichever Safari button you see.</p>
-            </>
-          ) : null}
-
-          {step === 1 ? (
-            <>
-              <div className="iosInstallStepDrawing">
-                <HousePlus aria-hidden="true" />
-              </div>
-              <h2>Add to Home Screen.</h2>
-              <p>
-                Scroll down. If it is missing: Edit Actions → Add to Home
-                Screen.
-              </p>
-            </>
-          ) : null}
-
-          {step === 2 ? (
-            <>
-              <div className="iosInstallStepDrawing">
-                <AppWindow aria-hidden="true" />
-              </div>
-              <h2>Tap Add.</h2>
-              <p>Keep “Open as Web App” turned on.</p>
-            </>
-          ) : null}
-        </section>
+          <li className="iosInstallStep">
+            <span className="iosInstallStepNumber">3</span>
+            <span className="iosInstallStepIcon" aria-hidden="true">
+              <AppWindow />
+            </span>
+            <span className="iosInstallStepCopy">
+              <strong>Tap Add</strong>
+              <small>Keep “Open as Web App” turned on.</small>
+            </span>
+          </li>
+        </ol>
 
         <button
           className="iosInstallGateConfirm"
           type="button"
-          onClick={completeStep}
+          onClick={finishGuide}
         >
           <span className="iosInstallConfirmBox" aria-hidden="true">
             <Check />
           </span>
-          {step === 0
-            ? "Share is open"
-            : step === 1
-              ? "I tapped Add to Home Screen"
-              : `I added ${appName}`}
+          <span>I added {appName}</span>
         </button>
 
-        {step > 0 ? (
-          <button
-            className="iosInstallBackButton"
-            type="button"
-            onClick={() => setStep((currentStep) => currentStep - 1)}
-          >
-            Back one step
-          </button>
-        ) : null}
+        <div className="iosInstallTapHere" aria-hidden="true">
+          <span>Tap here</span>
+          <ArrowDown />
+        </div>
       </div>
     </section>
   );

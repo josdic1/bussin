@@ -6,7 +6,7 @@
   padding:
     max(0.75rem, env(safe-area-inset-top))
     max(0.75rem, env(safe-area-inset-right))
-    max(0.75rem, env(safe-area-inset-bottom))
+    max(6.5rem, calc(env(safe-area-inset-bottom) + 5.5rem))
     max(0.75rem, env(safe-area-inset-left));
   overflow-y: auto;
   overscroll-behavior: none;
@@ -20,21 +20,19 @@
   min-height: calc(100dvh - 1.5rem);
   margin: 0 auto;
   flex-direction: column;
-  justify-content: center;
-  gap: clamp(0.55rem, 2vh, 0.85rem);
+  justify-content: flex-start;
+  gap: 0.65rem;
 }
 
 .iosInstallGateHeader {
-  padding: 0.75rem 0.9rem;
+  padding: 0.85rem 0.95rem;
   border: var(--line) solid var(--ink);
   background: var(--paper);
 }
 
 .iosInstallGateKicker,
 .iosInstallGateHeader h1,
-.iosInstallGateHeader p,
-.iosInstallCurrentStep h2,
-.iosInstallCurrentStep p {
+.iosInstallGateHeader p {
   margin: 0;
 }
 
@@ -49,236 +47,109 @@
 
 .iosInstallGateHeader h1,
 .iosInstallGateDoneCard h1,
-.iosInstallCurrentStep h2 {
+.iosInstallStepCopy strong {
   font-family: var(--display-font);
   font-weight: 400;
   letter-spacing: -0.04em;
-  line-height: 0.88;
+  line-height: 0.9;
   text-transform: uppercase;
 }
 
 .iosInstallGateHeader h1 {
-  margin-top: 0.22rem;
-  font-size: clamp(2.35rem, 11vw, 4rem);
+  margin-top: 0.24rem;
+  font-size: clamp(2.5rem, 12vw, 4rem);
 }
 
 .iosInstallGateHeader > p:last-child {
   margin-top: 0.42rem;
-  font-size: 0.76rem;
+  font-size: 0.78rem;
   font-weight: 800;
 }
 
-.iosInstallRoute {
-  position: relative;
+.iosInstallSteps {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  align-items: center;
-  min-height: 4rem;
-  padding: 0 1.1rem;
-  border: var(--line) solid var(--ink);
-  background: var(--ink);
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.iosInstallRouteLine {
-  position: absolute;
-  z-index: 0;
-  right: 17%;
-  left: 17%;
-  height: 0.28rem;
+.iosInstallStep {
+  display: grid;
+  grid-template-columns: clamp(3.2rem, 15vw, 4.25rem) clamp(3.25rem, 16vw, 4.4rem) minmax(0, 1fr);
+  min-height: clamp(6.2rem, 22vw, 7.4rem);
+  border: var(--line) solid var(--ink);
   background: var(--paper);
 }
 
-.iosInstallRouteStop {
-  position: relative;
-  z-index: 2;
+.iosInstallStepNumber {
   display: grid;
-  place-self: center;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border: 3px solid var(--paper);
-  border-radius: 50%;
+  border-right: var(--line) solid var(--ink);
+  background: var(--acid);
+  font-family: var(--display-font);
+  font-size: clamp(2.4rem, 11vw, 3.6rem);
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.iosInstallStepIcon {
+  display: grid;
+  place-items: center;
+  border-right: var(--line) solid var(--ink);
   background: var(--ink);
   color: var(--paper);
-  font-family: var(--display-font);
-  font-size: 1rem;
-  line-height: 1;
 }
 
-.iosInstallRouteStop svg {
-  width: 1.15rem;
-  height: 1.15rem;
-  stroke-width: 3.4;
-}
-
-.iosInstallRouteStopDone,
-.iosInstallRouteStopCurrent {
-  border-color: var(--ink);
-  background: var(--acid);
-  color: var(--ink);
-}
-
-.iosInstallRouteStopCurrent {
-  outline: 3px solid var(--signal);
-  outline-offset: 3px;
-}
-
-.iosInstallRouteBus {
-  position: absolute;
-  z-index: 3;
-  top: -0.7rem;
-  display: grid;
-  place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border: 3px solid var(--ink);
-  background: var(--signal);
-  color: var(--ink);
-  transform: translateX(-50%);
-  transition: left 240ms ease-out;
-}
-
-.iosInstallRouteBus svg {
-  width: 1.45rem;
-  height: 1.45rem;
-  stroke-width: 2.7;
-}
-
-.iosInstallRouteBusStep1 {
-  left: 17%;
-}
-
-.iosInstallRouteBusStep2 {
-  left: 50%;
-}
-
-.iosInstallRouteBusStep3 {
-  left: 83%;
-}
-
-.iosInstallStepCount {
-  margin: 0;
-  color: var(--signal);
-  font-size: 0.65rem;
-  font-weight: 900;
-  letter-spacing: 0.05em;
-  line-height: 1;
-  text-align: center;
-  text-transform: uppercase;
-}
-
-.iosInstallCurrentStep {
-  display: grid;
-  place-items: center;
-  min-height: clamp(13rem, 36vh, 18rem);
-  padding: clamp(0.9rem, 4vw, 1.35rem);
-  border: var(--line) solid var(--ink);
-  background: var(--paper);
-  text-align: center;
-}
-
-.iosInstallStepDrawing {
-  display: grid;
-  place-items: center;
-  width: clamp(6rem, 29vw, 8rem);
-  height: clamp(6rem, 29vw, 8rem);
-  margin-bottom: 0.8rem;
-  border: var(--line) solid var(--ink);
-  background: var(--acid);
-}
-
-.iosInstallStepDrawing > svg {
-  width: 62%;
-  height: 62%;
-  stroke-width: 2;
-}
-
-.iosInstallShareDrawing {
-  display: flex;
-  width: min(100%, 21rem);
-  gap: 0.65rem;
-  border: 0;
-  background: transparent;
-}
-
-.iosInstallShareDrawing > span {
-  display: grid;
-  flex: 1 1 0;
-  place-items: center;
-  align-content: center;
-  min-width: 0;
-  height: 7rem;
-  padding: 0.45rem;
-  border: var(--line) solid var(--ink);
-  background: var(--acid);
-}
-
-.iosInstallShareDrawing > span > svg,
-.iosInstallMoreThenShare {
-  width: 3.7rem;
-  height: 3.7rem;
-}
-
-.iosInstallShareDrawing svg {
-  width: 2.45rem;
-  height: 2.45rem;
+.iosInstallStepIcon svg {
+  width: clamp(1.8rem, 8vw, 2.5rem);
+  height: clamp(1.8rem, 8vw, 2.5rem);
   stroke-width: 2.5;
 }
 
-.iosInstallShareDrawing small {
-  margin-top: 0.35rem;
-  font-size: 0.62rem;
-  font-weight: 900;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.iosInstallShareDrawing > b {
-  align-self: center;
-  font-family: var(--display-font);
-  font-size: 1rem;
-  font-weight: 400;
-  text-transform: uppercase;
-}
-
-.iosInstallMoreThenShare {
+.iosInstallStepCopy {
   display: flex;
-  align-items: center;
+  min-width: 0;
+  padding: 0.7rem 0.75rem;
+  flex-direction: column;
   justify-content: center;
 }
 
-.iosInstallMoreThenShare i {
-  font-family: Arial, sans-serif;
-  font-size: 1.5rem;
-  font-style: normal;
+.iosInstallStepCopy strong {
+  display: block;
+  font-size: clamp(1.35rem, 6.2vw, 2rem);
 }
 
-.iosInstallCurrentStep h2 {
-  font-size: clamp(2rem, 9vw, 3.2rem);
-}
-
-.iosInstallCurrentStep p {
-  max-width: 22rem;
-  margin-top: 0.5rem;
-  font-size: clamp(0.72rem, 3vw, 0.9rem);
+.iosInstallStepCopy small {
+  display: block;
+  margin-top: 0.32rem;
+  font-size: clamp(0.62rem, 2.8vw, 0.78rem);
   font-weight: 800;
-  line-height: 1.25;
+  line-height: 1.2;
+}
+
+.iosInstallStepCopy small svg {
+  width: 1.15em;
+  height: 1.15em;
+  margin: 0 0.08em;
+  vertical-align: -0.2em;
+  stroke-width: 3;
 }
 
 .iosInstallGateConfirm {
   display: grid;
-  grid-template-columns: 2.8rem minmax(0, 1fr);
+  grid-template-columns: clamp(3.2rem, 15vw, 4.25rem) minmax(0, 1fr);
   align-items: center;
   width: 100%;
-  min-height: 4.4rem;
+  min-height: clamp(4.8rem, 19vw, 6rem);
   padding: 0;
   border: var(--line) solid var(--ink);
   background: var(--acid);
   color: var(--ink);
   font-family: var(--display-font);
-  font-size: clamp(1.2rem, 5.5vw, 1.8rem);
+  font-size: clamp(1.55rem, 7.4vw, 2.35rem);
   font-weight: 400;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   line-height: 0.9;
   text-align: left;
   text-transform: uppercase;
@@ -294,28 +165,14 @@
 }
 
 .iosInstallConfirmBox svg {
-  width: 1.65rem;
-  height: 1.65rem;
+  width: 1.8rem;
+  height: 1.8rem;
   stroke-width: 3.2;
 }
 
-.iosInstallGateConfirm > :last-child,
-.iosInstallGateConfirm {
-  column-gap: 0.75rem;
-}
-
-.iosInstallBackButton,
-.iosInstallGateAgain {
-  justify-self: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font-size: 0.68rem;
-  font-weight: 900;
-  text-decoration: underline;
-  text-transform: uppercase;
-  cursor: pointer;
+.iosInstallGateConfirm > span:last-child {
+  min-width: 0;
+  padding: 0.55rem 0.8rem;
 }
 
 .iosInstallGateDone {
@@ -365,6 +222,15 @@
   align-items: center;
   gap: 0.4rem;
   margin-top: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-decoration: underline;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
 .iosInstallGateAgain svg {
@@ -372,21 +238,91 @@
   height: 1rem;
 }
 
+.iosInstallTapHere {
+  position: fixed;
+  z-index: 2;
+  right: 50%;
+  bottom: max(0.35rem, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  color: var(--ink);
+  pointer-events: none;
+  transform: translateX(50%);
+  animation: iosInstallTapBounce 900ms ease-in-out infinite alternate;
+}
+
+.iosInstallTapHere span {
+  padding: 0.3rem 0.7rem 0.24rem;
+  border: 3px solid var(--ink);
+  background: var(--acid);
+  font-family: var(--display-font);
+  font-size: 1rem;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.iosInstallTapHere svg {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-top: 0.15rem;
+  stroke-width: 3.2;
+  filter: drop-shadow(0 2px 0 var(--acid));
+}
+
+@keyframes iosInstallTapBounce {
+  from {
+    transform: translate(50%, -0.15rem);
+  }
+
+  to {
+    transform: translate(50%, 0.45rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iosInstallTapHere {
+    animation: none;
+  }
+}
+
+@media (max-width: 355px) {
+  .iosInstallStep {
+    grid-template-columns: 2.75rem 3rem minmax(0, 1fr);
+  }
+
+  .iosInstallStepNumber {
+    font-size: 2rem;
+  }
+
+  .iosInstallStepCopy {
+    padding: 0.6rem;
+  }
+
+  .iosInstallGateConfirm {
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+  }
+}
+
 @media (max-height: 720px) {
   .iosInstallGateInner {
-    justify-content: flex-start;
+    gap: 0.45rem;
+  }
+
+  .iosInstallGateHeader {
+    padding: 0.65rem 0.8rem;
   }
 
   .iosInstallGateHeader h1 {
-    font-size: clamp(2.05rem, 9vw, 3rem);
+    font-size: clamp(2.15rem, 9vw, 3rem);
   }
 
-  .iosInstallCurrentStep {
-    min-height: 12rem;
+  .iosInstallStep {
+    min-height: 5.1rem;
   }
 
-  .iosInstallStepDrawing {
-    width: 5.25rem;
-    height: 5.25rem;
+  .iosInstallGateConfirm {
+    min-height: 4.2rem;
   }
 }
