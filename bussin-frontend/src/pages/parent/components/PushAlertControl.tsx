@@ -7,6 +7,7 @@ const PARENT_CODE_STORAGE_KEY = "bussin.parentAccessCode";
 type PushAlertControlProps = {
   travelMinutes: number;
   cushionMinutes: number;
+  variant?: "default" | "quickSetup";
 };
 
 type AlertState =
@@ -82,6 +83,7 @@ async function saveSubscription(
 export function PushAlertControl({
   travelMinutes,
   cushionMinutes,
+  variant = "default",
 }: PushAlertControlProps) {
   const [alertState, setAlertState] = useState<AlertState>("CHECKING");
   const [error, setError] = useState("");
@@ -219,6 +221,51 @@ export function PushAlertControl({
       );
       setAlertState("ON");
     }
+  }
+
+  if (variant === "quickSetup") {
+    const isOn = alertState === "ON";
+    const isBusy =
+      alertState === "CHECKING" ||
+      alertState === "ENABLING" ||
+      alertState === "DISABLING";
+    const isUnavailable = alertState === "UNAVAILABLE";
+
+    return (
+      <div className="parentQuickSetupAlert">
+        <button
+          className={`parentQuickSetupAction${
+            isOn ? " parentQuickSetupActionActive" : ""
+          }`}
+          type="button"
+          disabled={isBusy || isUnavailable}
+          aria-pressed={isOn}
+          onClick={() =>
+            void (isOn ? disableAlert() : enableAlert())
+          }
+        >
+          <span className="parentQuickSetupIcon" aria-hidden="true">
+            <Bell />
+          </span>
+          <strong>{isOn ? "Alerts on" : "Turn on alerts"}</strong>
+          <small>
+            {isUnavailable
+              ? "Open the Home Screen app"
+              : isBusy
+                ? "One moment…"
+                : isOn
+                  ? "You’re ready"
+                  : "Tap the bell"}
+          </small>
+        </button>
+
+        {error ? (
+          <p className="parentQuickSetupError" role="alert">
+            {error}
+          </p>
+        ) : null}
+      </div>
+    );
   }
 
   if (alertState === "UNAVAILABLE") {

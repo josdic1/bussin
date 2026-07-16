@@ -1,10 +1,18 @@
-import { CalendarClock, MapPin, Power, RefreshCw, X } from "lucide-react";
+import {
+  CalendarClock,
+  MapPin,
+  Power,
+  RefreshCw,
+  Timer,
+  X,
+} from "lucide-react";
 import type { ArrivalEstimate } from "@bussin/shared";
 import { type FormEvent, useEffect, useState } from "react";
 import { appConfig } from "../../../config";
 import { PushAlertControl } from "./PushAlertControl";
 
 const STORAGE_KEY = "bussin.parentLeavePreferences";
+const TIMING_CONFIRMED_STORAGE_KEY = "bussin.parentTimingConfirmed";
 const PARENT_CODE_STORAGE_KEY = "bussin.parentAccessCode";
 
 type LeavePreferences = {
@@ -83,6 +91,9 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState("");
   const [isLocationPanelOpen, setIsLocationPanelOpen] = useState(false);
+  const [isTimingConfirmed, setIsTimingConfirmed] = useState(
+    () => localStorage.getItem(TIMING_CONFIRMED_STORAGE_KEY) === "true",
+  );
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -203,9 +214,24 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
     };
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(nextPreferences));
+    localStorage.setItem(TIMING_CONFIRMED_STORAGE_KEY, "true");
 
     setPreferences(nextPreferences);
+    setIsTimingConfirmed(true);
     setIsEditing(false);
+  }
+
+  function useFiveMinuteHeadsUp() {
+    const nextPreferences = {
+      ...preferences,
+      cushionMinutes: 5,
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextPreferences));
+    localStorage.setItem(TIMING_CONFIRMED_STORAGE_KEY, "true");
+    setPreferences(nextPreferences);
+    setCushionMinutes(5);
+    setIsTimingConfirmed(true);
   }
 
   function startEditing() {
@@ -458,30 +484,76 @@ export function LeaveCountdown({ estimate }: LeaveCountdownProps) {
 
   if (!estimate) {
     return (
-      <section className="parentSetupPanel" aria-label="Parent alert setup">
-        <header className="parentSetupHeader">
+      <section className="parentQuickSetup" aria-label="Parent alert setup">
+        <header className="parentQuickSetupHeader">
           <p className="panelKicker">Before the bus starts</p>
-          <h2>Get ready now</h2>
-          <p>
-            Set these once. Bussin will use them automatically when the driver
-            starts sharing.
-          </p>
+          <h2>Get ready</h2>
+          <p>Tap what you want Bussin to use.</p>
         </header>
 
-        <div className="parentSetupFacts">
-          <span>
-            <MapPin aria-hidden="true" />
-            <small>Drive time</small>
-            <strong>{savedPreferences.travelMinutes} min</strong>
-          </span>
-          <span>
-            <CalendarClock aria-hidden="true" />
-            <small>Arrive early</small>
-            <strong>{savedPreferences.cushionMinutes} min</strong>
-          </span>
+        <div className="parentQuickSetupChoices">
+          <button
+            className={`parentQuickSetupAction${
+              savedPreferences.usesCurrentLocation
+                ? " parentQuickSetupActionActive"
+                : ""
+            }`}
+            type="button"
+            disabled={isLocating}
+            aria-pressed={savedPreferences.usesCurrentLocation}
+            onClick={() => void enableOrResetCurrentLocation()}
+          >
+            <span className="parentQuickSetupIcon" aria-hidden="true">
+              <MapPin />
+            </span>
+            <strong>
+              {savedPreferences.usesCurrentLocation
+                ? "Location on"
+                : "Get my location"}
+            </strong>
+            <small>
+              {isLocating
+                ? "Finding you…"
+                : savedPreferences.usesCurrentLocation
+                  ? `${savedPreferences.travelMinutes} min drive`
+                  : "Tap the pin"}
+            </small>
+          </button>
+
+          <button
+            className={`parentQuickSetupAction${
+              isTimingConfirmed ? " parentQuickSetupActionActive" : ""
+            }`}
+            type="button"
+            aria-pressed={isTimingConfirmed}
+            onClick={useFiveMinuteHeadsUp}
+          >
+            <span className="parentQuickSetupIcon" aria-hidden="true">
+              <Timer />
+            </span>
+            <strong>5 min heads-up</strong>
+            <small>{isTimingConfirmed ? "Timing set" : "Tap the timer"}</small>
+          </button>
+
+          <PushAlertControl
+            travelMinutes={savedPreferences.travelMinutes}
+            cushionMinutes={savedPreferences.cushionMinutes}
+            variant="quickSetup"
+          />
         </div>
 
-        {preferenceControls}
+        <div className="parentQuickSetupManual">
+          <span>Or</span>
+          <button type="button" onClick={startEditing}>
+            I’ll type it myself <b aria-hidden="true">›</b>
+          </button>
+        </div>
+
+        {locationError ? (
+          <p className="parentQuickSetupError" role="alert">
+            {locationError}
+          </p>
+        ) : null}
       </section>
     );
   }

@@ -151,18 +151,7 @@ export function ParentTripStatus() {
 
   if (trip?.status === "NOT_SHARING") {
     return (
-      <section className="tripControls parentDashboard parentDashboardState">
-        <DriverMessage
-          message={trip?.driverMessage}
-          sentAt={trip?.driverMessageUpdatedAt}
-        />
-        <p className="tripStatus">
-          <strong>The bus hasn’t started yet</strong>
-        </p>
-        <p className="tripDetail">
-          Set up your leave alert now. This page will update automatically when
-          the driver starts sharing.
-        </p>
+      <section className="tripControls parentDashboard parentDashboardState parentDashboardSetupOnly">
         <LeaveCountdown estimate={null} />
       </section>
     );
