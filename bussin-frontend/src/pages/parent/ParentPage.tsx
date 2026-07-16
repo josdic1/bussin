@@ -29,7 +29,7 @@ export function ParentPage() {
     >
       <IosInstallGate
         appName="Bussin"
-        storageKey="bussin.parentInstallGateSeen"
+        storageKey="bussin.parentInstallGateSeenV2"
       >
         <ParentTripStatus />
       </IosInstallGate>

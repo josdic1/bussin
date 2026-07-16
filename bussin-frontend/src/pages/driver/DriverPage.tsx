@@ -31,7 +31,7 @@ export function DriverPage() {
     >
       <IosInstallGate
         appName="Bussin Driver"
-        storageKey="bussin.driverInstallGateSeen"
+        storageKey="bussin.driverInstallGateSeenV2"
       >
         <DriverTripControls />
       </IosInstallGate>
