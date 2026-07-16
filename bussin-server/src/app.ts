@@ -2,6 +2,8 @@ import cors from "cors";
 import express, {
   type ErrorRequestHandler,
 } from "express";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { accessRouter } from "./auth/access.routes.js";
 import { config } from "./config.js";
 import { healthRouter } from "./modules/health/health.routes.js";
@@ -33,6 +35,24 @@ export function createApp() {
   app.use("/api/driver/trip", driverTripRouter);
   app.use("/api/parent/trip", parentTripRouter);
   app.use("/api/parent/push", parentPushRouter);
+
+  if (config.NODE_ENV === "production") {
+    const serverDirectory = path.dirname(fileURLToPath(import.meta.url));
+    const frontendDirectory = path.resolve(
+      serverDirectory,
+      "../../bussin-frontend/dist",
+    );
+
+    app.use(express.static(frontendDirectory, { index: false }));
+    app.get("*", (request, response, next) => {
+      if (request.path.startsWith("/api/")) {
+        next();
+        return;
+      }
+
+      response.sendFile(path.join(frontendDirectory, "index.html"));
+    });
+  }
 
   const errorHandler: ErrorRequestHandler = (
     error,
