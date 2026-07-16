@@ -123,12 +123,7 @@ export function ParentTripStatus() {
 
   if (isLoading) {
     return (
-      <section className="tripControls parentDashboard parentDashboardState">
-        <DriverMessage
-          message={trip?.driverMessage}
-          sentAt={trip?.driverMessageUpdatedAt}
-        />
-        <p className="tripStatus">Loading trip status…</p>
+      <section className="tripControls parentDashboard parentDashboardState parentDashboardSetupOnly">
         <LeaveCountdown estimate={null} />
       </section>
     );
@@ -136,11 +131,7 @@ export function ParentTripStatus() {
 
   if (error) {
     return (
-      <section className="tripControls parentDashboard parentDashboardState">
-        <DriverMessage
-          message={trip?.driverMessage}
-          sentAt={trip?.driverMessageUpdatedAt}
-        />
+      <section className="tripControls parentDashboard parentDashboardState parentDashboardSetupOnly">
         <p className="formError" role="alert">
           {error}
         </p>
@@ -149,67 +140,13 @@ export function ParentTripStatus() {
     );
   }
 
-  if (trip?.status === "NOT_SHARING") {
+  if (
+    trip?.status === "NOT_SHARING" ||
+    trip?.status === "STALE" ||
+    !trip?.arrivalEstimate
+  ) {
     return (
       <section className="tripControls parentDashboard parentDashboardState parentDashboardSetupOnly">
-        <LeaveCountdown estimate={null} />
-      </section>
-    );
-  }
-
-  if (trip?.status === "STALE") {
-    return (
-      <section className="tripControls parentDashboard parentDashboardState">
-        <DriverMessage
-          message={trip?.driverMessage}
-          sentAt={trip?.driverMessageUpdatedAt}
-        />
-        <p className="tripStatus">
-          Status: <strong>Location signal is stale</strong>
-        </p>
-        <p className="tripDetail">
-          The driver is sharing, but the latest location is old.
-        </p>
-
-        <LeaveCountdown estimate={null} />
-
-        {trip.location ? (
-          <div className="staleLocationAge">
-            <LocationAge ageSeconds={trip.location.ageSeconds} />
-          </div>
-        ) : null}
-
-        {trip.location ? (
-          <BusMap
-            latitude={trip.location.latitude}
-            longitude={trip.location.longitude}
-
-            destination={trip.arrivalEstimate?.destination}
-
-            route={trip.arrivalEstimate?.route}
-
-            routeCalculatedAt={trip.arrivalEstimate?.calculatedAt}
-            isStale
-          />
-        ) : null}
-      </section>
-    );
-  }
-
-  if (!trip?.arrivalEstimate) {
-    return (
-      <section className="tripControls parentDashboard parentDashboardState">
-        <DriverMessage
-          message={trip?.driverMessage}
-          sentAt={trip?.driverMessageUpdatedAt}
-        />
-        <p className="tripStatus">
-          <strong>The bus is getting ready</strong>
-        </p>
-        <p className="tripDetail">
-          Waiting for the first route estimate. Your settings are available
-          below.
-        </p>
         <LeaveCountdown estimate={null} />
       </section>
     );

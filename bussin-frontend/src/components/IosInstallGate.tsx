@@ -1,6 +1,6 @@
 import {
-  AppWindow,
   ArrowDown,
+  ChevronDown,
   Ellipsis,
   HousePlus,
   RotateCcw,
@@ -119,46 +119,55 @@ export function IosInstallGate({
             <p>Put the {appName} icon on your Home Screen.</p>
           </header>
 
-          <div className="iosInstallSafariStart">
-            <p>First, tap the button you see</p>
+          <p className="iosInstallSafariShortcut">
+            Already see Share? Start at 2.
+          </p>
 
-            <div className="iosInstallSafariChoices">
-              <span className="iosInstallSafariChoice">
-                <SquareArrowUp aria-hidden="true" />
-                <strong>Share</strong>
+          <ol className="iosInstallFlow">
+            <li className="iosInstallStep">
+              <span className="iosInstallStepIcon" aria-hidden="true">
+                <Ellipsis />
               </span>
-
-              <span className="iosInstallSafariOr">or</span>
-
-              <span className="iosInstallSafariChoice">
-                <Ellipsis aria-hidden="true" />
-                <strong>More</strong>
-                <small>Then Share</small>
+              <span className="iosInstallStepCopy">
+                <small>1</small>
+                <strong>Tap More</strong>
               </span>
-            </div>
-          </div>
+            </li>
 
-          <ol className="iosInstallSteps">
+            <li className="iosInstallStep">
+              <span className="iosInstallStepIcon" aria-hidden="true">
+                <SquareArrowUp />
+              </span>
+              <span className="iosInstallStepCopy">
+                <small>2</small>
+                <strong>Tap Share</strong>
+              </span>
+            </li>
+
+            <li className="iosInstallStep">
+              <span className="iosInstallStepIcon" aria-hidden="true">
+                <ChevronDown />
+              </span>
+              <span className="iosInstallStepCopy">
+                <small>3</small>
+                <strong>View More</strong>
+              </span>
+            </li>
+
             <li className="iosInstallStep">
               <span className="iosInstallStepIcon" aria-hidden="true">
                 <HousePlus />
               </span>
               <span className="iosInstallStepCopy">
+                <small>4</small>
                 <strong>Add to Home Screen</strong>
-                <small>Scroll down · If missing, Edit Actions</small>
-              </span>
-            </li>
-
-            <li className="iosInstallStep">
-              <span className="iosInstallStepIcon" aria-hidden="true">
-                <AppWindow />
-              </span>
-              <span className="iosInstallStepCopy">
-                <strong>Tap Add</strong>
-                <small>Keep Open as Web App on</small>
               </span>
             </li>
           </ol>
+
+          <p className="iosInstallFinalInstruction">
+            Keep <strong>Open as Web App</strong> on. Tap <strong>Add</strong>.
+          </p>
 
           <button
             className="iosInstallGateConfirm"
@@ -170,7 +179,7 @@ export function IosInstallGate({
         </div>
 
         <div className="iosInstallTapHere" aria-hidden="true">
-          <span>Tap here</span>
+          <span>Tap •••</span>
           <ArrowDown />
         </div>
       </div>
