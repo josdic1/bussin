@@ -6,10 +6,29 @@
     <meta name="theme-color" content="#070707" />
     <meta name="description" content="Bussin — know when the bus will arrive and when to leave." />
     <title>Bussin</title>
+    <script>
+      (() => {
+        const isDriver = window.location.pathname.startsWith("/driver");
+        const appTitle = isDriver ? "Bussin Driver" : "Bussin";
+
+        document.title = appTitle;
+
+        const mobileTitle = document.createElement("meta");
+        mobileTitle.name = "apple-mobile-web-app-title";
+        mobileTitle.content = appTitle;
+        document.head.appendChild(mobileTitle);
+
+        const manifest = document.createElement("link");
+        manifest.rel = "manifest";
+        manifest.href = isDriver
+          ? "/manifest-driver.webmanifest?v=1"
+          : "/manifest.webmanifest?v=5";
+        document.head.appendChild(manifest);
+      })();
+    </script>
     <link rel="icon" href="/favicon.svg?v=4" type="image/svg+xml" />
     <link rel="icon" href="/favicon-32.png?v=4" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=4" sizes="180x180" />
-    <link rel="manifest" href="/manifest.webmanifest" />
   </head>
   <body>
     <div id="root"></div>
